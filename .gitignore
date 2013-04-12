@@ -1,0 +1,28 @@
+# Directories #
+Obj
+obj
+Lib
+lib
+Bin
+bin
+Debug
+debug
+Release
+release
+
+# Compiled #
+*.obj
+*.exe
+*.lib
+
+# Build #
+*.ncb
+*.suo
+*.user
+*.pdb
+*.sdf
+*.opensdf
+
+# Extra #
+*.zip
+*.rar
