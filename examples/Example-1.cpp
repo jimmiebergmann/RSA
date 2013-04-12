@@ -33,8 +33,17 @@ int main( )
 	// Might be useful later on.
 	srand( time( NULL ) );
 
-	LargeInteger largeInt( 2, 65535, 0 );
-	largeInt.PrintBinary( );
+	LargeInteger largeInt_1( 2, 65535, 0 );
+	LargeInteger largeInt_2( 2, 123, 0 );
+	LargeInteger largeInt_3( 4, 1, 2, 3 ,4);
+
+	largeInt_1 = largeInt_3;
+
+	largeInt_1.PrintBinary( );
+	std::cout << std::endl;
+	largeInt_2.PrintBinary( );
+	std::cout << std::endl;
+	largeInt_3.PrintBinary( );
 
 
 	// Wait for any input in order to close the program.

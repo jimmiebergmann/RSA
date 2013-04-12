@@ -96,6 +96,12 @@ LargeInteger::~LargeInteger( )
 // Public functions
 void LargeInteger::PrintBinary( ) const
 {
+	if( m_Size == 0 )
+	{
+		std::cout << "0";
+		return;
+	}
+
 	for( int i = m_Size - 1; i >= 0; i-- )
 	{
 		for( int j = (sizeof( unsigned short ) * 8) - 1; j >= 0; j-- )
@@ -126,6 +132,18 @@ unsigned short LargeInteger::GetComponent( const unsigned int p_Index ) const
 	return m_pComponents[ p_Index ];
 }
 
+// Operators
+void LargeInteger::operator = ( const LargeInteger & p_LargeInteger )
+{
+	Copy( p_LargeInteger );
+}
+
+LargeInteger LargeInteger::operator + ( const LargeInteger & p_LargeInteger ) const
+{
+
+	return *this;
+}
+
 // Private functions
 bool LargeInteger::Allocate( const unsigned int p_Size )
 {
@@ -148,8 +166,11 @@ bool LargeInteger::Allocate( const unsigned int p_Size )
 
 void LargeInteger::Copy( const LargeInteger & p_LargeInteger )
 {
+	// Make sure we don't go out of bound by calculating the right size.
+	unsigned int componentsToCopy = ( m_Size >= p_LargeInteger.m_Size ) ? p_LargeInteger.m_Size : m_Size ;
+
 	// You might lose data if the parameter large integer is larger in allocation size.
-	for( unsigned int i = 0; i < m_Size; i++ )
+	for( unsigned int i = 0; i < componentsToCopy; i++ )
 	{
 		m_pComponents[ i ] = p_LargeInteger.m_pComponents[ i ];
 	}

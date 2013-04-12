@@ -54,6 +54,11 @@ public:
 	// Get functions
 	unsigned short GetComponent( const unsigned int p_Index ) const;
 
+	// Operators
+	void operator = ( const LargeInteger & p_LargeInteger );
+	LargeInteger operator + ( const LargeInteger & p_LargeInteger ) const;
+
+
 private:
 
 	// Private functions
