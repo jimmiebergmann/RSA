@@ -49,10 +49,10 @@ public:
 	void PrintBinary( ) const;
 
 	// Set functions
-	void SetElement( const unsigned int p_Index, const unsigned short p_Value );
+	void SetComponent( const unsigned int p_Index, const unsigned short p_Value );
 
 	// Get functions
-	unsigned short GetElement( const unsigned int p_Index ) const;
+	unsigned short GetComponent( const unsigned int p_Index ) const;
 
 private:
 
@@ -61,7 +61,7 @@ private:
 	void Copy( const LargeInteger & p_LargeInteger );
 
 	// Private variable members
-	unsigned short * m_pValue;
+	unsigned short * m_pComponents;
 	unsigned int m_Size;
 
 };

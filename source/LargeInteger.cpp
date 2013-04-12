@@ -29,13 +29,13 @@
 
 // Constructors / descructors
 LargeInteger::LargeInteger( ) :
-	m_pValue( NULL ),
+	m_pComponents( NULL ),
 	m_Size( 0 )
 {
 }
 
 LargeInteger::LargeInteger( const unsigned int p_Size ) :
-	m_pValue( NULL ),
+	m_pComponents( NULL ),
 	m_Size( 0 )
 
 {
@@ -45,8 +45,8 @@ LargeInteger::LargeInteger( const unsigned int p_Size ) :
 	}
 }
 
-LargeInteger::LargeInteger( const unsigned int p_Size, unsigned short p_Values, ... ) :
-	m_pValue( NULL ),
+LargeInteger::LargeInteger( const unsigned int p_Size, unsigned short p_Components, ... ) :
+	m_pComponents( NULL ),
 	m_Size( 0 )
 {
 	if( !Allocate( p_Size ) )
@@ -54,14 +54,14 @@ LargeInteger::LargeInteger( const unsigned int p_Size, unsigned short p_Values, 
 		return;
 	}
 
-	// Get the pointer to the value param in order to get all the values that we want to set.
-	unsigned short * pointer = &p_Values;
+	// Get the pointer to the value param in order to get all the components that we want to set.
+	unsigned short * pointer = &p_Components;
 
 	// Set every single value
 	for( unsigned int i = 0; i < p_Size; i++ )
 	{
 		// Set the current value to the value that the pointer currently is pointing at.
-		m_pValue[ i ] = *pointer;
+		m_pComponents[ i ] = *pointer;
 
 		// Move the pointer 2 bytes since we are using shorts.
 		pointer += 2;
@@ -69,7 +69,7 @@ LargeInteger::LargeInteger( const unsigned int p_Size, unsigned short p_Values, 
 }
 
 LargeInteger::LargeInteger( const LargeInteger & p_LargeInteger ) :
-	m_pValue( NULL ),
+	m_pComponents( NULL ),
 	m_Size( 0 )
 {
 	if( Allocate( p_LargeInteger.m_Size ) )
@@ -82,11 +82,11 @@ LargeInteger::LargeInteger( const LargeInteger & p_LargeInteger ) :
 
 LargeInteger::~LargeInteger( )
 {
-	// Delete the allocated values
-	if( m_pValue )
+	// Delete the allocated components
+	if( m_pComponents )
 	{
-		delete [ ] m_pValue;
-		m_pValue = NULL;
+		delete [ ] m_pComponents;
+		m_pComponents = NULL;
 	}
 
 	// Set the size of the large interger to 0
@@ -100,30 +100,30 @@ void LargeInteger::PrintBinary( ) const
 	{
 		for( int j = (sizeof( unsigned short ) * 8) - 1; j >= 0; j-- )
 		{
-			std::cout << CheckBit( m_pValue[ i ], j );
+			std::cout << CheckBit( m_pComponents[ i ], j );
 		}
 		std::cout << " ";
 	}
 }
 
 // Set functions
-void LargeInteger::SetElement( const unsigned int p_Index, const unsigned short p_Value )
+void LargeInteger::SetComponent( const unsigned int p_Index, const unsigned short p_Component )
 {
 	if( p_Index < m_Size )
 	{
-		m_pValue[ p_Index ] = p_Value;
+		m_pComponents[ p_Index ] = p_Component;
 	}
 }
 
 // Get functions
-unsigned short LargeInteger::GetElement( const unsigned int p_Index ) const
+unsigned short LargeInteger::GetComponent( const unsigned int p_Index ) const
 {
 	if( p_Index >= m_Size )
 	{
 		return 0;
 	}
 
-	return m_pValue[ p_Index ];
+	return m_pComponents[ p_Index ];
 }
 
 // Private functions
@@ -135,13 +135,13 @@ bool LargeInteger::Allocate( const unsigned int p_Size )
 	}
 
 	// Make sure to delete the old allocated data if there are any.
-	if( m_pValue )
+	if( m_pComponents )
 	{
-		delete [ ] m_pValue;
+		delete [ ] m_pComponents;
 	}
 	
 	m_Size = p_Size;
-	m_pValue = new unsigned short[ p_Size ];
+	m_pComponents = new unsigned short[ p_Size ];
 
 	return true;
 }
@@ -151,6 +151,6 @@ void LargeInteger::Copy( const LargeInteger & p_LargeInteger )
 	// You might lose data if the parameter large integer is larger in allocation size.
 	for( unsigned int i = 0; i < m_Size; i++ )
 	{
-		m_pValue[ i ] = p_LargeInteger.m_pValue[ i ];
+		m_pComponents[ i ] = p_LargeInteger.m_pComponents[ i ];
 	}
 }
