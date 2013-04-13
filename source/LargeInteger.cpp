@@ -94,6 +94,14 @@ LargeInteger::~LargeInteger( )
 }
 
 // Public functions
+void LargeInteger::Clear( )
+{
+	for( unsigned int i = 0; i < m_Size; i++ )
+	{
+		m_pComponents[ i ] = 0;
+	}
+}
+
 void LargeInteger::PrintBinary( ) const
 {
 	if( m_Size == 0 )
@@ -138,11 +146,69 @@ void LargeInteger::operator = ( const LargeInteger & p_LargeInteger )
 	Copy( p_LargeInteger );
 }
 
-LargeInteger LargeInteger::operator + ( const LargeInteger & p_LargeInteger ) const
+void LargeInteger::operator += ( const LargeInteger & p_LargeInteger )
 {
+	unsigned int overflow = 0;
 
-	return *this;
+	for( unsigned int i = 0; i < m_Size; i++ )
+	{
+		overflow = static_cast<unsigned int>( m_pComponents[ i ] ) +
+			static_cast<unsigned int>( p_LargeInteger.m_pComponents[ i ] ) +
+			overflow;
+
+		//unsigned int a = overflow >> 16;
+		//unsigned int b = overflow << 16;
+
+		m_pComponents[ i ] = overflow & 0xFFFF;
+
+		//std::cout << m_pComponents[ i ] << std::endl;
+
+		overflow = overflow >> 16;
+	}
+
+	// We do not allow overflow at all. We should set all components
+	// to the max value if there's a overflow.
+	if( overflow )
+	{
+		for( unsigned int i = 0; i < m_Size; i++ )
+		{
+			m_pComponents[ i ] = 0xFFFF;
+		}
+	}	
+
+
+
+
 }
+
+/*
+std::auto_ptr< LargeInteger > LargeInteger::operator + ( const LargeInteger & p_LargeInteger ) const
+{
+	//std::auto_ptr< LargeInteger > number( new LargeInteger(m_Size) );
+	//LargeInteger number( m_Size );
+	//number.Clear( );
+
+	unsigned int overflow = 0;
+
+	for( unsigned int i = 0; i < m_Size; i++ )
+	{
+		overflow = static_cast<unsigned int>( m_pComponents[ i ] ) +
+			static_cast<unsigned int>( p_LargeInteger.m_pComponents[ i ] ) +
+			overflow;
+
+		//unsigned int a = overflow >> 16;
+		//unsigned int b = overflow << 16;
+
+		number.m_pComponents[ i ] = overflow & 0xFFFF;
+
+		std::cout << number.m_pComponents[ i ] << std::endl;
+
+		overflow = overflow >> 16;
+	}
+
+	//return number;
+	return std::auto_ptr< LargeInteger >( new LargeInteger(m_Size) );
+}*/
 
 // Private functions
 bool LargeInteger::Allocate( const unsigned int p_Size )

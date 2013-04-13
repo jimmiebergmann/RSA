@@ -29,21 +29,25 @@
 
 int main( )
 {
+
 	// Let's seed the rand function by using the time.
 	// Might be useful later on.
 	srand( time( NULL ) );
 
-	LargeInteger largeInt_1( 2, 65535, 0 );
-	LargeInteger largeInt_2( 2, 123, 0 );
-	LargeInteger largeInt_3( 4, 1, 2, 3 ,4);
-
-	largeInt_1 = largeInt_3;
+	LargeInteger largeInt_1( 2, 65535, 4096 );
+	LargeInteger largeInt_2( 2, 65535, 4096 );
+	
+	
 
 	largeInt_1.PrintBinary( );
 	std::cout << std::endl;
 	largeInt_2.PrintBinary( );
+	std::cout << std::endl << std::endl;
+
+	largeInt_1 += largeInt_2;
+
+	largeInt_1.PrintBinary( );
 	std::cout << std::endl;
-	largeInt_3.PrintBinary( );
 
 
 	// Wait for any input in order to close the program.

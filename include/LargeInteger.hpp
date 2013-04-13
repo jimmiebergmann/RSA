@@ -30,6 +30,7 @@
 #define Bit(n)       (1 << (n))
 #define CheckBit(n,i) ((bool)(((n) & Bit(i)) != 0)) // <- Use this
 
+#include <memory>
 #include <string>
 #include <iostream>
 
@@ -46,6 +47,7 @@ public:
 	~LargeInteger( );
 
 	// Public functions
+	void Clear( );
 	void PrintBinary( ) const;
 
 	// Set functions
@@ -56,7 +58,7 @@ public:
 
 	// Operators
 	void operator = ( const LargeInteger & p_LargeInteger );
-	LargeInteger operator + ( const LargeInteger & p_LargeInteger ) const;
+	void operator += ( const LargeInteger & p_LargeInteger );
 
 
 private:
