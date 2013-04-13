@@ -34,12 +34,28 @@ int main( )
 	// Might be useful later on.
 	srand( time( NULL ) );
 
-	LargeInteger largeInt_1( 2, 65535, 0 );
-	LargeInteger largeInt_2( 2, 65535, 1 );
-	
+	LargeInteger a( 2, 0, 0 );
+	LargeInteger b( 3, 65535, 0, 0 );
+	//LargeInteger largeInt_3( 2, 65535, 0 );
 
-	std::cout << ( largeInt_1 == (unsigned short)65535 ) << std::endl;
-	std::cout << ( largeInt_2 == (unsigned int)65535 + 65535 + 1 ) << std::endl;
+	if( !a )
+	{
+		std::cout << "True!" << std::endl;
+	}
+
+
+	
+	/*std::cout << largeInt_1 << std::endl;
+	std::cout << largeInt_2 << std::endl;
+
+	largeInt_1 -= largeInt_1;//largeInt_1 + largeInt_2;
+
+	
+	std::cout << largeInt_1 << std::endl;*/
+	//std::cout << largeInt_3 << std::endl;
+
+	//std::cout << ( largeInt_1 == (unsigned short)65535 ) << std::endl;
+	//std::cout << ( largeInt_2 == (unsigned int)65535 + 65535 + 1 ) << std::endl;
  
 
 
@@ -49,12 +65,12 @@ int main( )
 	largeInt_2.PrintBinary( );
 	std::cout << std::endl << std::endl;
 
-	largeInt_1 += largeInt_2;
+	//largeInt_1 -= largeInt_2;
 
-	largeInt_1.PrintBinary( );
+	largeInt_3.PrintBinary( );
 	std::cout << std::endl;
-*/
 
+*/
 	// Wait for any input in order to close the program.
 	std::cin.get( );
 	return 0;
