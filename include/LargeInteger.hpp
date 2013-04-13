@@ -58,6 +58,9 @@ public:
 
 	// Operators
 	void operator = ( const LargeInteger & p_LargeInteger );
+	bool operator == ( const unsigned short p_Short ) const;
+	bool operator == ( const unsigned int p_Integer ) const;
+	bool operator == ( const LargeInteger & p_LargeInteger ) const;
 	void operator += ( const LargeInteger & p_LargeInteger );
 
 

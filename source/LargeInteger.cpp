@@ -146,23 +146,85 @@ void LargeInteger::operator = ( const LargeInteger & p_LargeInteger )
 	Copy( p_LargeInteger );
 }
 
+bool LargeInteger::operator == ( const unsigned short p_Short ) const
+{
+	// Make sure the large integer is allocated
+	if( m_Size == 0 )
+	{
+		return false;
+	}
+	
+	// The first component should be equal to the param
+	if( m_pComponents[ 0 ] != p_Short )
+	{
+		return false;
+	}
+
+	// Now let's make sure all the other components are 0
+	for( unsigned int i = 1; i < m_Size; i++ )
+	{
+		if( m_pComponents[ i ] != 0 )
+		{
+			return false;
+		}
+	}
+
+	return true;
+
+}
+
+bool LargeInteger::operator == ( const unsigned int p_Integer ) const
+{
+	// Make sure the large integer is allocated
+	if( m_Size <= 1 )
+	{
+		return false;
+	}
+	
+	// The first and second component should be equal to the param
+	if( m_pComponents[ 0 ] != ( p_Integer & 0xFFFF ) ||
+		m_pComponents[ 1 ] != ( p_Integer >> 16 & 0xFFFF ))
+	{
+		return false;
+	}
+
+	// Now let's make sure all the other components are 0
+	for( unsigned int i = 2; i < m_Size; i++ )
+	{
+		if( m_pComponents[ i ] != 0 )
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+bool LargeInteger::operator == ( const LargeInteger & p_LargeInteger ) const
+{
+	// Make sure the large integer is allocated
+	if( m_Size == 0 )
+	{
+		return false;
+	}
+}
+
 void LargeInteger::operator += ( const LargeInteger & p_LargeInteger )
 {
 	unsigned int overflow = 0;
 
 	for( unsigned int i = 0; i < m_Size; i++ )
 	{
+		// Calculate the new current component by adding the two componets
+		// plus the last overflow. (Still use the overflow variable fort this, easier)
 		overflow = static_cast<unsigned int>( m_pComponents[ i ] ) +
 			static_cast<unsigned int>( p_LargeInteger.m_pComponents[ i ] ) +
 			overflow;
 
-		//unsigned int a = overflow >> 16;
-		//unsigned int b = overflow << 16;
-
+		// Set the components( just the first 16 bits )
 		m_pComponents[ i ] = overflow & 0xFFFF;
 
-		//std::cout << m_pComponents[ i ] << std::endl;
-
+		// Calculate the new overflow by bitshift 16 bits
 		overflow = overflow >> 16;
 	}
 
@@ -174,11 +236,7 @@ void LargeInteger::operator += ( const LargeInteger & p_LargeInteger )
 		{
 			m_pComponents[ i ] = 0xFFFF;
 		}
-	}	
-
-
-
-
+	}
 }
 
 /*
