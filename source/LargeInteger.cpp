@@ -464,11 +464,34 @@ bool LargeInteger::operator >= ( const unsigned short p_Short ) const
 
 bool LargeInteger::operator >= ( const LargeInteger & p_LargeInteger ) const
 {
-	return false;
+	// "hacky fix". Not the fastest one.
+	return ( *this > p_LargeInteger ) || ( *this == p_LargeInteger );
 }
 
 bool LargeInteger::operator < ( const unsigned short p_Short ) const
 {
+	// Make sure the large integer is allocated
+	if( m_Size == 0 )
+	{
+		return false;
+	}
+
+	// Check if any of the last components isn't 0
+	for( unsigned int i = 1; i < m_Size; i++ )
+	{
+		if( m_pComponents[ i ] != 0 )
+		{
+			return true;
+		}
+	}
+
+	
+	// Check the first component against the value param
+	if( m_pComponents[ 0 ] < p_Short )
+	{
+		return true;
+	}
+
 	return false;
 }
 
@@ -480,12 +503,34 @@ bool LargeInteger::operator < ( const LargeInteger & p_LargeInteger ) const
 
 bool LargeInteger::operator <= ( const unsigned short p_Short ) const
 {
+	// Make sure the large integer is allocated
+	if( m_Size == 0 )
+	{
+		return false;
+	}
+
+	// Check if any of the last components isn't 0
+	for( unsigned int i = 1; i < m_Size; i++ )
+	{
+		if( m_pComponents[ i ] != 0 )
+		{
+			return true;
+		}
+	}
+
+	// Check the first component against the value param
+	if( m_pComponents[ 0 ] <= p_Short )
+	{
+		return true;
+	}
+
 	return false;
 }
 
 bool LargeInteger::operator <= ( const LargeInteger & p_LargeInteger ) const
 {
-	return false;
+	// "hacky fix". Not the fastest one.
+	return ( *this < p_LargeInteger ) || ( *this == p_LargeInteger );
 }
 
 LargeInteger LargeInteger::operator + ( const LargeInteger & p_LargeInteger ) const

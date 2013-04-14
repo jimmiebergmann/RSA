@@ -71,11 +71,11 @@ public:
 	bool operator > ( const unsigned short p_Short ) const;
 	bool operator > ( const LargeInteger & p_LargeInteger ) const;
 	bool operator >= ( const unsigned short p_Short ) const;
-	bool operator >= ( const LargeInteger & p_LargeInteger ) const; // NOT WORKING
-	bool operator < ( const unsigned short p_Short ) const;  // NOT WORKING
+	bool operator >= ( const LargeInteger & p_LargeInteger ) const;
+	bool operator < ( const unsigned short p_Short ) const;
 	bool operator < ( const LargeInteger & p_LargeInteger ) const;
-	bool operator <= ( const unsigned short p_Short ) const; // NOT WORKING
-	bool operator <= ( const LargeInteger & p_LargeInteger ) const; // NOT WORKING
+	bool operator <= ( const unsigned short p_Short ) const;
+	bool operator <= ( const LargeInteger & p_LargeInteger ) const;
 	LargeInteger operator + ( const LargeInteger & p_LargeInteger ) const;
 	LargeInteger & operator += ( const LargeInteger & p_LargeInteger );
 	LargeInteger operator - ( const LargeInteger & p_LargeInteger ) const; // NOT WORKING
