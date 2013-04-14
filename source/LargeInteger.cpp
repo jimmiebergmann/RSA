@@ -122,6 +122,18 @@ void LargeInteger::Clear( )
 	}
 }
 
+void LargeInteger::Copy( const LargeInteger & p_LargeInteger )
+{
+	// Make sure we don't go out of bound by calculating the right size.
+	unsigned int componentsToCopy = ( m_Size >= p_LargeInteger.m_Size ) ? p_LargeInteger.m_Size : m_Size ;
+
+	// You might lose data if the parameter large integer is larger in allocation size.
+	for( unsigned int i = 0; i < componentsToCopy; i++ )
+	{
+		m_pComponents[ i ] = p_LargeInteger.m_pComponents[ i ];
+	}
+}
+
 int LargeInteger::Compare( const unsigned short p_Short ) const
 {
 	for( unsigned int i = 1; i < m_Size; i++ )
@@ -334,10 +346,10 @@ bool LargeInteger::operator <= ( const LargeInteger & p_LargeInteger ) const
 {
 	return Compare( p_LargeInteger ) <= 0;
 }
-
+/*
 LargeInteger LargeInteger::operator + ( const LargeInteger & p_LargeInteger ) const
 {
-	/*LargeInteger newInteger( m_Size );
+	LargeInteger newInteger( m_Size );
 	unsigned int overflow = 0;
 
 	for( unsigned int i = 0; i < m_Size; i++ )
@@ -366,10 +378,10 @@ LargeInteger LargeInteger::operator + ( const LargeInteger & p_LargeInteger ) co
 	}
 	
 	// Return a new large integer
-	return LargeInteger( newInteger.m_Size, newInteger.m_pComponents );*/
+	return LargeInteger( newInteger.m_Size, newInteger.m_pComponents );
 
 	return *this;
-}
+}*/
 
 LargeInteger & LargeInteger::operator += ( const LargeInteger & p_LargeInteger )
 {
@@ -403,6 +415,7 @@ LargeInteger & LargeInteger::operator += ( const LargeInteger & p_LargeInteger )
 	return *this;
 }
 
+/*
 LargeInteger LargeInteger::operator - ( const LargeInteger & p_LargeInteger ) const
 {
 	LargeInteger newInteger( m_Size );
@@ -473,16 +486,10 @@ LargeInteger LargeInteger::operator - ( const LargeInteger & p_LargeInteger ) co
 	}
 
 
-/*
-	for( unsigned int i = 0; i < m_Size; i++ )
-	{
-	}*/
-
-
 	// Return a new large integer
 	return LargeInteger( newInteger.m_Size, newInteger.m_pComponents );
 }
-
+*/
 LargeInteger & LargeInteger::operator -= ( const LargeInteger & p_LargeInteger )
 {
 	// Check if the param value is larger than the current one.
@@ -538,27 +545,12 @@ LargeInteger & LargeInteger::operator -= ( const LargeInteger & p_LargeInteger )
 	return *this;
 }
 
-LargeInteger LargeInteger::operator * ( const LargeInteger & p_LargeInteger ) const
-{
-	return *this;
-}
-
 LargeInteger & LargeInteger::operator *= ( const LargeInteger & p_LargeInteger )
 {
 	return *this;
 }
 
-LargeInteger LargeInteger::operator / ( const LargeInteger & p_LargeInteger ) const
-{
-	return *this;
-}
-
 LargeInteger & LargeInteger::operator /= ( const LargeInteger & p_LargeInteger )
-{
-	return *this;
-}
-
-LargeInteger LargeInteger::operator % ( const LargeInteger & p_LargeInteger ) const
 {
 	return *this;
 }
@@ -651,16 +643,4 @@ bool LargeInteger::Allocate( const unsigned int p_Size )
 	m_pComponents = new unsigned short[ p_Size ];
 
 	return true;
-}
-
-void LargeInteger::Copy( const LargeInteger & p_LargeInteger )
-{
-	// Make sure we don't go out of bound by calculating the right size.
-	unsigned int componentsToCopy = ( m_Size >= p_LargeInteger.m_Size ) ? p_LargeInteger.m_Size : m_Size ;
-
-	// You might lose data if the parameter large integer is larger in allocation size.
-	for( unsigned int i = 0; i < componentsToCopy; i++ )
-	{
-		m_pComponents[ i ] = p_LargeInteger.m_pComponents[ i ];
-	}
 }

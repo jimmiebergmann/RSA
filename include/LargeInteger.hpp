@@ -52,6 +52,7 @@ public:
 
 	// Public functions
 	void Clear( );
+	void Copy( const LargeInteger & p_LargeInteger );
 	int Compare( const unsigned short p_Short ) const;
 	int Compare( const LargeInteger & p_LargeInteger ) const;
 
@@ -79,16 +80,15 @@ public:
 	bool operator < ( const LargeInteger & p_LargeInteger ) const;
 	bool operator <= ( const unsigned short p_Short ) const;
 	bool operator <= ( const LargeInteger & p_LargeInteger ) const;
-
-	LargeInteger operator + ( const LargeInteger & p_LargeInteger ) const; // NOT WORKING
+	//LargeInteger operator + ( const LargeInteger & p_LargeInteger ) const; // NOT WORKING
 	LargeInteger & operator += ( const LargeInteger & p_LargeInteger ); // NOT WORKING
-	LargeInteger operator - ( const LargeInteger & p_LargeInteger ) const;
+	//LargeInteger operator - ( const LargeInteger & p_LargeInteger ) const;
 	LargeInteger & operator -= ( const LargeInteger & p_LargeInteger );  // NOT WORKING
-	LargeInteger operator * ( const LargeInteger & p_LargeInteger ) const; // NOT WORKING
+	//LargeInteger operator * ( const LargeInteger & p_LargeInteger ) const; // NOT WORKING
 	LargeInteger & operator *= ( const LargeInteger & p_LargeInteger );  // NOT WORKING
-	LargeInteger operator / ( const LargeInteger & p_LargeInteger ) const; // NOT WORKING
+	//LargeInteger operator / ( const LargeInteger & p_LargeInteger ) const; // NOT WORKING
 	LargeInteger & operator /= ( const LargeInteger & p_LargeInteger );  // NOT WORKING
-	LargeInteger operator % ( const LargeInteger & p_LargeInteger ) const; // NOT WORKING
+	//LargeInteger operator % ( const LargeInteger & p_LargeInteger ) const; // NOT WORKING
 	LargeInteger & operator %= ( const LargeInteger & p_LargeInteger );  // NOT WORKING
 	friend std::ostream & operator << ( std::ostream & os, const LargeInteger & p_LargeInteger );
 
@@ -96,7 +96,6 @@ private:
 
 	// Private functions
 	bool Allocate( const unsigned int p_Size );
-	void Copy( const LargeInteger & p_LargeInteger );
 
 	// Private variable members
 	unsigned short * m_pComponents;
