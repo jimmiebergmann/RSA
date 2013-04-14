@@ -346,42 +346,48 @@ bool LargeInteger::operator <= ( const LargeInteger & p_LargeInteger ) const
 {
 	return Compare( p_LargeInteger ) <= 0;
 }
-/*
-LargeInteger LargeInteger::operator + ( const LargeInteger & p_LargeInteger ) const
-{
-	LargeInteger newInteger( m_Size );
-	unsigned int overflow = 0;
 
-	for( unsigned int i = 0; i < m_Size; i++ )
+LargeInteger & LargeInteger::operator += ( const unsigned short p_Short )
+{
+	// Make sure the large integer is allocated
+	if( m_Size == 0 )
+	{
+		return *this;
+	}
+
+	// Calculate the overflow is any.
+	unsigned int overflow = static_cast<unsigned int>( m_pComponents[ 0 ] ) +
+			static_cast<unsigned int>( p_Short );
+
+	// Set the components( just the first 16 bits )
+	m_pComponents[ 0 ] = overflow & 0xFFFF;
+
+	// Calculate the new overflow by bitshift 16 bits
+	overflow = overflow >> 16;
+
+	// Handle the overflow
+	for( unsigned int i = 1; i < m_Size; i++ )
 	{
 		// Calculate the new current component by adding the two componets
 		// plus the last overflow. (Still use the overflow variable fort this, easier)
-		overflow = static_cast<unsigned int>( m_pComponents[ i ] ) +
-			static_cast<unsigned int>( p_LargeInteger.m_pComponents[ i ] ) +
-			overflow;
+		overflow = static_cast<unsigned int>( m_pComponents[ i ] ) + overflow;
 
 		// Set the components( just the first 16 bits )
-		newInteger.m_pComponents[ i ] = overflow & 0xFFFF;
+		m_pComponents[ i ] = overflow & 0xFFFF;
 
 		// Calculate the new overflow by bitshift 16 bits
 		overflow = overflow >> 16;
 	}
 
-	// We do not allow overflow at all. We should set all components
-	// to the max value if there's a overflow.
+	// Handle final overflow
 	if( overflow )
 	{
-		for( unsigned int i = 0; i < m_Size; i++ )
-		{
-			newInteger.m_pComponents[ i ] = 0xFFFF;
-		}
+		Overflow( );
+		return *this;
 	}
-	
-	// Return a new large integer
-	return LargeInteger( newInteger.m_Size, newInteger.m_pComponents );
 
 	return *this;
-}*/
+}
 
 LargeInteger & LargeInteger::operator += ( const LargeInteger & p_LargeInteger )
 {
