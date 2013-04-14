@@ -201,24 +201,6 @@ int LargeInteger::Compare( const LargeInteger & p_LargeInteger ) const
 	return 0;
 }
 
-void LargeInteger::PrintBinary( ) const
-{
-	if( m_Size == 0 )
-	{
-		std::cout << "0";
-		return;
-	}
-
-	for( int i = m_Size - 1; i >= 0; i-- )
-	{
-		for( int j = (sizeof( unsigned short ) * 8) - 1; j >= 0; j-- )
-		{
-			std::cout << CheckBit( m_pComponents[ i ], j );
-		}
-		std::cout << " ";
-	}
-}
-
 // Set functions
 void LargeInteger::SetComponent( const unsigned int p_Index, const unsigned short p_Component )
 {
@@ -237,6 +219,11 @@ unsigned short LargeInteger::GetComponent( const unsigned int p_Index ) const
 	}
 
 	return m_pComponents[ p_Index ];
+}
+
+unsigned int LargeInteger::GetSize( ) const
+{
+	return m_Size;
 }
 
 // Operators
@@ -289,335 +276,64 @@ void LargeInteger::operator = ( const LargeInteger & p_LargeInteger )
 	Copy( p_LargeInteger );
 }
 
-/*
 bool LargeInteger::operator == ( const unsigned short p_Short ) const
 {
-	// Make sure the large integer is allocated
-	if( m_Size == 0 )
-	{
-		return false;
-	}
-	
-	// The first component should be equal to the param
-	if( m_pComponents[ 0 ] != p_Short )
-	{
-		return false;
-	}
-
-	// Now let's make sure all the other components are 0
-	for( unsigned int i = 1; i < m_Size; i++ )
-	{
-		if( m_pComponents[ i ] != 0 )
-		{
-			return false;
-		}
-	}
-
-	return true;
-
+	return Compare( p_Short ) == 0;
 }
 
 bool LargeInteger::operator == ( const LargeInteger & p_LargeInteger ) const
 {
-	// Make sure the components are allocated
-	if( m_Size == 0 || p_LargeInteger.m_Size == 0 )
-	{
-		return false;
-	}
-
-	// Is the size of the two numbers the same?
-	if( m_Size == p_LargeInteger.m_Size )
-	{
-		for( unsigned int i = 0; i < m_Size; i++ )
-		{
-			if( m_pComponents[ i ] != p_LargeInteger.m_pComponents[ i ] )
-			{
-				return false;
-			}
-		}
-
-		return true;
-	}
-	else if( m_Size > p_LargeInteger.m_Size )
-	{
-		// Make sure all the values are equal to each other
-		for( unsigned int i = 0; i < p_LargeInteger.m_Size; i++ )
-		{
-			if( m_pComponents[ i ] != p_LargeInteger.m_pComponents[ i ] )
-			{
-				return false;
-			}
-		}
-
-		// Now let's make sure all the other components are 0
-		for( unsigned int i = p_LargeInteger.m_Size; i < m_Size; i++ )
-		{
-			if( m_pComponents[ i ] != 0 )
-			{
-				return false;
-			}
-		}
-
-		return true;
-	}
-	else if( m_Size < p_LargeInteger.m_Size )
-	{
-		// Make sure all the values are equal to each other
-		for( unsigned int i = 0; i < m_Size; i++ )
-		{
-			if( m_pComponents[ i ] != p_LargeInteger.m_pComponents[ i ] )
-			{
-				return false;
-			}
-		}
-
-		// Now let's make sure all the other components are 0
-		for( unsigned int i = m_Size; i < p_LargeInteger.m_Size; i++ )
-		{
-			if( p_LargeInteger.m_pComponents[ i ] != 0 )
-			{
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-
-	// Will never reach this, but I don't like warnings.
-	return false;
+	return Compare( p_LargeInteger ) == 0;
 }
 
 bool LargeInteger::operator != ( const unsigned short p_Short ) const
 {
-	// Make sure the components are allocated
-	if( m_Size == 0 )
-	{
-		return false;
-	}
-
-	// Check the first component
-	if( m_pComponents[ 0 ] != p_Short )
-	{
-		return false;
-	}
-
-	// Now let's make sure all the other components are 0
-	for( unsigned int i = 1; i < m_Size; i++ )
-	{
-		if( m_pComponents[ i ] != 0 )
-		{
-			return false;
-		}
-	}
-	
-	return true;
+	return Compare( p_Short ) != 0;
 }
 
 bool LargeInteger::operator != ( const LargeInteger & p_LargeInteger ) const
 {
-	// Make sure the large integer is allocated
-	if( m_Size == 0 || p_LargeInteger.m_Size == 0 )
-	{
-		return false;
-	}
-
-	return false;
+	return Compare( p_LargeInteger ) != 0;
 }
 
 bool LargeInteger::operator > ( const unsigned short p_Short ) const
 {
-	// Make sure the large integer is allocated
-	if( m_Size == 0 )
-	{
-		return false;
-	}
-
-	// Check if any of the last components isn't 0
-	for( unsigned int i = 1; i < m_Size; i++ )
-	{
-		if( m_pComponents[ i ] != 0 )
-		{
-			return true;
-		}
-	}
-
-	
-	// Check the first component against the value param
-	if( m_pComponents[ 0 ] > p_Short )
-	{
-		return true;
-	}
-
-	return false;
+	return Compare( p_Short ) > 0;
 }
-
 bool LargeInteger::operator > ( const LargeInteger & p_LargeInteger ) const
 {
-	// Make sure the large integer is allocated
-	if( m_Size == 0 || p_LargeInteger.m_Size == 0 )
-	{
-		return false;
-	}
-
-	if( m_Size == p_LargeInteger.m_Size )
-	{
-		// Loop backwars
-		for( int i = m_Size - 1; i >= 0; i-- )
-		{
-			if( m_pComponents[ i ] > p_LargeInteger.m_pComponents[ i ] )
-			{
-				return true;
-			}
-		}
-		
-		return false;
-	}*/
-	/*else if( m_Size > p_LargeInteger.m_Size )
-	{
-		// Check if the last values is larger than 0
-		for( int i = m_Size - 1; i >= p_LargeInteger.m_Size; i-- )
-		{
-			if( m_pComponents[ i ]  != 0 )
-			{
-				return true;
-			}
-		}
-
-		// Now let's check all the other ones components
-		for( int i = p_LargeInteger.m_Size - 1; i >= 0; i-- )
-		{
-			if( m_pComponents[ i ] > p_LargeInteger.m_pComponents[ i ] )
-			{
-				return true;
-			}
-		}
-
-		return false;
-	}
-	else if( m_Size < p_LargeInteger.m_Size )
-	{
-		// Make sure that all the last components are == 0.
-		for( int i = p_LargeInteger.m_Size - 1; i >= m_Size; i-- )
-		{
-			if( p_LargeInteger.m_pComponents[ i ] != 0 )
-			{
-				return false;
-			}
-		}
-
-		// Now let's check all the other ones components
-		for( int i = m_Size - 1; i >= 0; i-- )
-		{
-			if( p_LargeInteger.m_pComponents[ i ] > m_pComponents[ i ] )
-			{
-				return true;
-			}
-		}
-
-		return false;
-	}*/
-
-	// Will never reach this, but I don't like warnings.
-/*	return false;
+	return Compare( p_LargeInteger ) > 0;
 }
 
 bool LargeInteger::operator >= ( const unsigned short p_Short ) const
 {
-	// Make sure the large integer is allocated
-	if( m_Size == 0 )
-	{
-		return false;
-	}
-
-	// Check if any of the last components isn't 0
-	for( unsigned int i = 1; i < m_Size; i++ )
-	{
-		if( m_pComponents[ i ] != 0 )
-		{
-			return true;
-		}
-	}
-
-	// Check the first component against the value param
-	if( m_pComponents[ 0 ] >= p_Short )
-	{
-		return true;
-	}
-
-	return false;
+	return Compare( p_Short ) >= 0;
 }
 
 bool LargeInteger::operator >= ( const LargeInteger & p_LargeInteger ) const
 {
-	// "hacky fix". Not the fastest one.
-	return ( *this > p_LargeInteger ) || ( *this == p_LargeInteger );
+	return Compare( p_LargeInteger ) >= 0;
 }
 
 bool LargeInteger::operator < ( const unsigned short p_Short ) const
 {
-	// Make sure the large integer is allocated
-	if( m_Size == 0 )
-	{
-		return false;
-	}
-
-	// Check if any of the last components isn't 0
-	for( unsigned int i = 1; i < m_Size; i++ )
-	{
-		if( m_pComponents[ i ] != 0 )
-		{
-			return true;
-		}
-	}
-
-	
-	// Check the first component against the value param
-	if( m_pComponents[ 0 ] < p_Short )
-	{
-		return true;
-	}
-
-	return false;
+	return Compare( p_Short ) < 0;
 }
 
 bool LargeInteger::operator < ( const LargeInteger & p_LargeInteger ) const
 {
-	// Why not reuse the > operator for this task?
-	return  p_LargeInteger > *this;
+	return Compare( p_LargeInteger ) < 0;
 }
 
 bool LargeInteger::operator <= ( const unsigned short p_Short ) const
 {
-	// Make sure the large integer is allocated
-	if( m_Size == 0 )
-	{
-		return false;
-	}
-
-	// Check if any of the last components isn't 0
-	for( unsigned int i = 1; i < m_Size; i++ )
-	{
-		if( m_pComponents[ i ] != 0 )
-		{
-			return true;
-		}
-	}
-
-	// Check the first component against the value param
-	if( m_pComponents[ 0 ] <= p_Short )
-	{
-		return true;
-	}
-
-	return false;
+	return Compare( p_Short ) <= 0;
 }
 
 bool LargeInteger::operator <= ( const LargeInteger & p_LargeInteger ) const
 {
-	// "hacky fix". Not the fastest one.
-	return ( *this < p_LargeInteger ) || ( *this == p_LargeInteger );
-}*/
+	return Compare( p_LargeInteger ) <= 0;
+}
 
 LargeInteger LargeInteger::operator + ( const LargeInteger & p_LargeInteger ) const
 {
