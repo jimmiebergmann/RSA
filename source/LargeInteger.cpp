@@ -385,9 +385,10 @@ LargeInteger LargeInteger::operator + ( const LargeInteger & p_LargeInteger ) co
 
 LargeInteger & LargeInteger::operator += ( const LargeInteger & p_LargeInteger )
 {
-	/*unsigned int overflow = 0;
+	unsigned int overflow = 0;
+	unsigned int Size = ( m_Size < p_LargeInteger.m_Size ) ? m_Size : p_LargeInteger.m_Size;
 
-	for( unsigned int i = 0; i < m_Size; i++ )
+	for( unsigned int i = 0; i < Size; i++ )
 	{
 		// Calculate the new current component by adding the two componets
 		// plus the last overflow. (Still use the overflow variable fort this, easier)
@@ -402,16 +403,41 @@ LargeInteger & LargeInteger::operator += ( const LargeInteger & p_LargeInteger )
 		overflow = overflow >> 16;
 	}
 
-	// We do not allow overflow at all. We should set all components
-	// to the max value if there's a overflow.
-	if( overflow )
+	// So now we have to fill the rest of the bits with something.
+	if( m_Size > p_LargeInteger.m_Size )
 	{
-		for( unsigned int i = 0; i < m_Size; i++ )
+		for( unsigned int i = Size; i < m_Size; i++ )
 		{
-			m_pComponents[ i ] = 0xFFFF;
+			// Calculate the new current component by adding the two componets
+			// plus the last overflow. (Still use the overflow variable fort this, easier)
+			overflow = static_cast<unsigned int>( m_pComponents[ i ] ) + overflow;
+
+			// Set the components( just the first 16 bits )
+			m_pComponents[ i ] = overflow & 0xFFFF;
+
+			// Calculate the new overflow by bitshift 16 bits
+			overflow = overflow >> 16;
 		}
 	}
-*/
+	else if( m_Size < p_LargeInteger.m_Size )
+	{
+		for( unsigned int i = Size; i < p_LargeInteger.m_Size; i++ )
+		{
+			if( p_LargeInteger.m_pComponents[ i ] != 0 )
+			{
+				Overflow( );
+				return *this;
+			}
+		}
+	}
+
+	// Handle final overflow
+	if( overflow )
+	{
+		Overflow( );
+		return *this;
+	}
+	
 	return *this;
 }
 
@@ -648,10 +674,16 @@ bool LargeInteger::Allocate( const unsigned int p_Size )
 // Underflow and overflow functions that are called every time we reach any operator error.
 void LargeInteger::Underflow( )
 {
-
+	for( unsigned int i = 0; i < m_Size; i++ )
+	{
+		m_pComponents[ i ] = 0;
+	}
 }
 
 void LargeInteger::Overflow( )
 {
-
+	for( unsigned int i = 0; i < m_Size; i++ )
+	{
+		m_pComponents[ i ] = 0xFFFF;
+	}
 }
