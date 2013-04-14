@@ -52,6 +52,8 @@ public:
 
 	// Public functions
 	void Clear( );
+	int Compare( const unsigned short p_Short ) const;
+	int Compare( const LargeInteger & p_LargeInteger ) const;
 	void PrintBinary( ) const;
 
 	// Set functions
@@ -61,25 +63,26 @@ public:
 	unsigned short GetComponent( const unsigned int p_Index ) const;
 
 	// Operators
-	unsigned short operator [ ] ( unsigned int p_Index ) const;
+	unsigned short operator [ ] ( unsigned int p_Index ) const; // Same as GetComponent( ... )
 	operator bool( ) const;
 	bool operator ! ( ) const;
-	void operator = ( const LargeInteger & p_LargeInteger );
-	bool operator == ( const unsigned short p_Short ) const;
-	bool operator == ( const LargeInteger & p_LargeInteger ) const;
-	bool operator != ( const unsigned short p_Short ) const;
-	bool operator != ( const LargeInteger & p_LargeInteger ) const;
-	bool operator > ( const unsigned short p_Short ) const;
-	bool operator > ( const LargeInteger & p_LargeInteger ) const;
-	bool operator >= ( const unsigned short p_Short ) const;
-	bool operator >= ( const LargeInteger & p_LargeInteger ) const;
-	bool operator < ( const unsigned short p_Short ) const;
-	bool operator < ( const LargeInteger & p_LargeInteger ) const;
-	bool operator <= ( const unsigned short p_Short ) const;
-	bool operator <= ( const LargeInteger & p_LargeInteger ) const;
-	LargeInteger operator + ( const LargeInteger & p_LargeInteger ) const;
-	LargeInteger & operator += ( const LargeInteger & p_LargeInteger );
-	LargeInteger operator - ( const LargeInteger & p_LargeInteger ) const; // NOT WORKING
+	inline void operator = ( const LargeInteger & p_LargeInteger );
+	//bool operator == ( const unsigned short p_Short ) const;
+	inline bool operator == ( const LargeInteger & p_LargeInteger ) const { return Compare( p_LargeInteger ) == 0; };
+	//bool operator != ( const unsigned short p_Short ) const;
+	inline bool operator != ( const LargeInteger & p_LargeInteger ) const { return Compare( p_LargeInteger ) != 0; };
+	//bool operator > ( const unsigned short p_Short ) const;
+	inline bool operator > ( const LargeInteger & p_LargeInteger ) const { return Compare( p_LargeInteger ) > 0; };
+	//bool operator >= ( const unsigned short p_Short ) const;
+	inline bool operator >= ( const LargeInteger & p_LargeInteger ) const { return Compare( p_LargeInteger ) >= 0; };
+	//bool operator < ( const unsigned short p_Short ) const;
+	inline bool operator < ( const LargeInteger & p_LargeInteger ) const { return Compare( p_LargeInteger ) < 0; };
+	//bool operator <= ( const unsigned short p_Short ) const;
+	inline bool operator <= ( const LargeInteger & p_LargeInteger ) const { return Compare( p_LargeInteger ) <= 0; };
+
+	LargeInteger operator + ( const LargeInteger & p_LargeInteger ) const; // NOT WORKING
+	LargeInteger & operator += ( const LargeInteger & p_LargeInteger ); // NOT WORKING
+	LargeInteger operator - ( const LargeInteger & p_LargeInteger ) const;
 	LargeInteger & operator -= ( const LargeInteger & p_LargeInteger );  // NOT WORKING
 	LargeInteger operator * ( const LargeInteger & p_LargeInteger ) const; // NOT WORKING
 	LargeInteger & operator *= ( const LargeInteger & p_LargeInteger );  // NOT WORKING

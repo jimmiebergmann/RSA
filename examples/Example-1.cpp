@@ -34,12 +34,31 @@ int main( )
 	// Might be useful later on.
 	srand( time( NULL ) );
 
-	LargeInteger a( 2, 0, 0 );
-	LargeInteger b( 3, 65535, 0, 2 );
+	LargeInteger a( 3,	0, 0, 1 );
+	LargeInteger b( 3,	2, 1, 1 );
 	//LargeInteger largeInt_3( 2, 65535, 0 );
 
-	std::cout << b[ 0 ] << "  " << b[ 1 ] << "  " << b[ 2 ] << std::endl;
+	std::cout << a.Compare( 65535 ) << std::endl;
 
+/*
+	std::cout << a << std::endl;
+	std::cout << b << std::endl;
+	std::cout << ( a - b ) << std::endl;
+	std::cout << ( a + b ) << std::endl;
+*/
+	//std::cout << a.Compare( b ) << std::endl;
+
+	/*std::cout << (bool)( b > a ) << std::endl;
+	std::cout << (bool)( b >= a ) << std::endl;
+
+	std::cout << (bool)( b < a ) << std::endl;
+	std::cout << (bool)( b <= a ) << std::endl;*/
+
+/*
+	std::cout << a << std::endl;
+	std::cout << b << std::endl;
+	std::cout << ( a - b ) << std::endl;
+*/
 /*
 	if( !a )
 	{
