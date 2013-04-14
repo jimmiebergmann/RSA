@@ -96,6 +96,8 @@ private:
 
 	// Private functions
 	bool Allocate( const unsigned int p_Size );
+	void Underflow( );
+	void Overflow( );
 
 	// Private variable members
 	unsigned short * m_pComponents;

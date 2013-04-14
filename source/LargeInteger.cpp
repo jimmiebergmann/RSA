@@ -249,7 +249,7 @@ LargeInteger::operator bool( ) const
 	// Make sure the large integer is allocated
 	if( m_Size == 0 )
 	{
-		return true;
+		return false;
 	}
 
 	// Check if all the components are 0
@@ -643,4 +643,15 @@ bool LargeInteger::Allocate( const unsigned int p_Size )
 	m_pComponents = new unsigned short[ p_Size ];
 
 	return true;
+}
+
+// Underflow and overflow functions that are called every time we reach any operator error.
+void LargeInteger::Underflow( )
+{
+
+}
+
+void LargeInteger::Overflow( )
+{
+
 }
