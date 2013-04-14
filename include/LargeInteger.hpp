@@ -61,6 +61,7 @@ public:
 	unsigned short GetComponent( const unsigned int p_Index ) const;
 
 	// Operators
+	unsigned short operator [ ] ( unsigned int p_Index ) const;
 	operator bool( ) const;
 	bool operator ! ( ) const;
 	void operator = ( const LargeInteger & p_LargeInteger );

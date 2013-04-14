@@ -35,13 +35,16 @@ int main( )
 	srand( time( NULL ) );
 
 	LargeInteger a( 2, 0, 0 );
-	LargeInteger b( 3, 65535, 0, 0 );
+	LargeInteger b( 3, 65535, 0, 2 );
 	//LargeInteger largeInt_3( 2, 65535, 0 );
 
+	std::cout << b[ 0 ] << "  " << b[ 1 ] << "  " << b[ 2 ] << std::endl;
+
+/*
 	if( !a )
 	{
 		std::cout << "True!" << std::endl;
-	}
+	}*/
 
 
 	

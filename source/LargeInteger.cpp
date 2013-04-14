@@ -161,6 +161,17 @@ unsigned short LargeInteger::GetComponent( const unsigned int p_Index ) const
 }
 
 // Operators
+unsigned short LargeInteger::operator [ ] ( unsigned int p_Index ) const
+{
+	// Make sure we don't overflow the size
+	if( p_Index >= m_Size )
+	{
+		return 0;
+	}
+
+	return m_pComponents[ p_Index ];
+}
+
 LargeInteger::operator bool( ) const
 {
 	// Make sure the large integer is allocated
