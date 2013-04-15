@@ -525,55 +525,54 @@ LargeInteger LargeInteger::operator - ( const LargeInteger & p_LargeInteger ) co
 LargeInteger & LargeInteger::operator -= ( const LargeInteger & p_LargeInteger )
 {
 	// Check if the param value is larger than the current one.
-	// We do this by using the > operator.
-	// NOT FAST AT ALL!
-	if( p_LargeInteger >= *this )
+	for( unsigned int i = m_Size; i < p_LargeInteger.m_Size; i++ )
 	{
-		Clear( );
+		if( p_LargeInteger.m_pComponents[ i ] != 0 )
+		{
+			Underflow( );
+			return *this;
+		}
+	}
+
+	unsigned short borrow = 0;
+	unsigned short currentComponent = 0;
+	unsigned int Size = ( m_Size < p_LargeInteger.m_Size ) ? m_Size : p_LargeInteger.m_Size;
+
+	for( unsigned int i = 0; i < Size; i++ )
+	{
+		currentComponent = m_pComponents[ i ];
+		m_pComponents[ i ] = currentComponent - p_LargeInteger.m_pComponents[ i ] - borrow;
+
+		borrow = static_cast< unsigned short >(
+			p_LargeInteger.m_pComponents[ i ] > currentComponent );
+	
+	}
+
+	if( m_Size > p_LargeInteger.m_Size )
+	{
+		// Calculate the rest.
+		for( unsigned int i = p_LargeInteger.m_Size; i < m_Size; i++ )
+		{
+			if( borrow == 0 )
+			{	
+				return *this;
+			}
+
+			currentComponent = m_pComponents[ i ];
+			m_pComponents[ i ] = currentComponent - borrow;
+			
+			borrow = static_cast< unsigned short >(
+				m_pComponents[ i ] > currentComponent );
+		}
+	}
+
+	// Handle final underflow
+	if( borrow )
+	{
+		Underflow( );
 		return *this;
 	}
 
-	/*bool smallerNumber = false;
-
-	for( int i = m_Size - 1; i >= 0 ; i-- )
-	{
-	}*/
-
-
-/*
-	int a = 21;
-
-	std::cout << "BIT: ";
-	for( int i = 31; i >= 0; i-- )
-	{
-		std::cout << CheckBit( a, i );
-	}
-	std::cout << std::endl << std::endl;
-
-*/
-/*
-	int overflow = 0;
-
-	for( int i = m_Size - 1; i >= 0 ; i-- )
-	{
-		// Calculate the new current component by subtracting the two componets
-		// plus adding the last overflow. (Still use the overflow variable fort this, easier)
-		overflow = static_cast<int>( m_pComponents[ i ] ) -
-			static_cast<int>( p_LargeInteger.m_pComponents[ i ] ) +
-			overflow;
-
-		if( overflow > 0 )
-		{
-			m_pComponents[ i ] = overflow & 0xFFFF;
-		}
-		else
-		{
-			m_pComponents[ i ] = 0;
-			overflow = 0xFFFF + overflow;
-		}
-
-	}
-*/
 	return *this;
 }
 
