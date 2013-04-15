@@ -447,81 +447,46 @@ LargeInteger & LargeInteger::operator += ( const LargeInteger & p_LargeInteger )
 	return *this;
 }
 
-/*
-LargeInteger LargeInteger::operator - ( const LargeInteger & p_LargeInteger ) const
+LargeInteger & LargeInteger::operator -= ( const unsigned short p_Short )
 {
-	LargeInteger newInteger( m_Size );
+	// Make sure the large integer is allocated
+	if( m_Size == 0 )
+	{
+		return *this;
+	}
 
 	unsigned short borrow = 0;
+	unsigned short currentComponent = m_pComponents[ 0 ];
+	m_pComponents[ 0 ] = currentComponent - p_Short;
 
-	if( m_Size == p_LargeInteger.m_Size )
+	borrow = static_cast< unsigned short >(
+		p_Short > currentComponent );
+
+	// Try to fix the borrow
+	for( unsigned int i = 1; i < m_Size; i++ )
 	{
-		for( unsigned int i = 0; i < m_Size; i++ )
-		{
-			newInteger.m_pComponents[ i ] = m_pComponents[ i ] - p_LargeInteger.m_pComponents[ i ] - borrow;
-
-			borrow = static_cast< unsigned short >(
-				p_LargeInteger.m_pComponents[ i ] > m_pComponents[ i ] );
-		}
-	}
-	else if( m_Size > p_LargeInteger.m_Size )
-	{
-		for( unsigned int i = 0; i < p_LargeInteger.m_Size; i++ )
-		{
-			newInteger.m_pComponents[ i ] = m_pComponents[ i ] - p_LargeInteger.m_pComponents[ i ] - borrow;
-
-			borrow = static_cast< unsigned short >(
-				p_LargeInteger.m_pComponents[ i ] > m_pComponents[ i ] );
+		if( borrow == 0 )
+		{	
+			return *this;
 		}
 
-		for( unsigned int i = p_LargeInteger.m_Size; i < m_Size; i++ )
-		{
-			if( m_pComponents[ i ] != 0 )
-			{
-				borrow = 1;
-				break;
-			}
-
-			newInteger.m_pComponents[ i ] = 0;
-		}
-
-	}
-	else if( m_Size < p_LargeInteger.m_Size )
-	{
-		for( unsigned int i = 0; i < m_Size; i++ )
-		{
-			newInteger.m_pComponents[ i ] = m_pComponents[ i ] - p_LargeInteger.m_pComponents[ i ] - borrow;
-
-			borrow = static_cast< unsigned short >(
-				p_LargeInteger.m_pComponents[ i ] > m_pComponents[ i ] );
-		}
-
-		for( unsigned int i = m_Size; i < p_LargeInteger.m_Size; i++ )
-		{
-			if( p_LargeInteger.m_pComponents[ i ] != 0 )
-			{
-				borrow = -1;
-				break;
-			}
-		}
-
-	}
-
-	// We're having a overflow if there's any borrowed numbers left.
-	// Then let's return a clear large integer.
-	if( borrow != 0 )
-	{
-		newInteger.Clear( );
+		currentComponent = m_pComponents[ i ];
+		m_pComponents[ i ] = currentComponent - borrow;
 		
-		// Return a new large integer
-		return LargeInteger( newInteger.m_Size, newInteger.m_pComponents );
+		borrow = static_cast< unsigned short >(
+			m_pComponents[ i ] > currentComponent );
 	}
 
+	// Handle final underflow
+	if( borrow )
+	{
+		Underflow( );
+		return *this;
+	}
 
-	// Return a new large integer
-	return LargeInteger( newInteger.m_Size, newInteger.m_pComponents );
+	return *this;
 }
-*/
+
 LargeInteger & LargeInteger::operator -= ( const LargeInteger & p_LargeInteger )
 {
 	// Check if the param value is larger than the current one.

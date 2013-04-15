@@ -34,12 +34,12 @@ int main( )
 	// Might be useful later on.
 	srand( time( NULL ) );
 
-	LargeInteger a( 2,	2, 0  );
+	LargeInteger a( 2,	2, 1  );
 	LargeInteger b( 3,	1, 0, 0  );
 	//LargeInteger largeInt_3( 2, 65535, 0 );
 
 	std::cout << a << std::endl;
-	std::cout << (a -= b ) << std::endl;
+	std::cout << (a -= (unsigned short)( 5 ) ) << std::endl;
 
 
 	//std::cout << (bool)(a != (unsigned short)65535) << std::endl;

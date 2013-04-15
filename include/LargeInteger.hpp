@@ -82,8 +82,9 @@ public:
 	bool operator <= ( const LargeInteger & p_LargeInteger ) const;
 	LargeInteger & operator += ( const unsigned short p_Short );
 	LargeInteger & operator += ( const LargeInteger & p_LargeInteger );
+	LargeInteger & operator -= ( const unsigned short p_Short );
+	LargeInteger & operator -= ( const LargeInteger & p_LargeInteger );
 
-	LargeInteger & operator -= ( const LargeInteger & p_LargeInteger );  // NOT WORKING
 	LargeInteger & operator *= ( const LargeInteger & p_LargeInteger );  // NOT WORKING
 	LargeInteger & operator /= ( const LargeInteger & p_LargeInteger );  // NOT WORKING
 	LargeInteger & operator %= ( const LargeInteger & p_LargeInteger );  // NOT WORKING
