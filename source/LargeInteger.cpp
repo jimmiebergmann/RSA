@@ -543,6 +543,54 @@ LargeInteger & LargeInteger::operator -= ( const LargeInteger & p_LargeInteger )
 
 LargeInteger & LargeInteger::operator *= ( const LargeInteger & p_LargeInteger )
 {
+	// !NOTE! !NOTE! !NOTE! !NOTE! !NOTE!
+	// Use smart pointer here please?!
+
+	// Make sure the large integers are allocated
+	if( m_Size == 0 || p_LargeInteger.m_Size == 0 )
+	{
+		return *this;
+	}
+
+	// Dublicate the components into an array called "miltiplier"
+	unsigned int i;
+	unsigned short * multiplier = new unsigned short[ m_Size ];
+	
+	for( i = 0; i < m_Size; i++ )
+	{
+		multiplier[ i ] = m_pComponents[ i ];
+		m_pComponents[ i ] = 0;
+	}
+
+	// Multiply
+	for( i = 0; i < m_Size; i++ )
+	{
+		for( unsigned int j = 0; j < p_LargeInteger.m_Size; j++ )
+		{
+			unsigned long product = multiplier[ i ] * p_LargeInteger.m_pComponents[ j ];
+			unsigned int k = i + j;
+
+			while( product != 0 )
+			{
+				if( k >= m_Size )
+				{
+					delete [ ] multiplier;
+					Overflow( );
+					return *this;
+				}
+
+				product += m_pComponents[ k ];
+				m_pComponents[ k ] = product;
+				product >>= 16;
+				k++;
+			}
+		}
+	}
+
+
+	// Delete the allocated data
+	delete [ ] multiplier;
+
 	return *this;
 }
 
@@ -553,6 +601,23 @@ LargeInteger & LargeInteger::operator /= ( const LargeInteger & p_LargeInteger )
 
 LargeInteger & LargeInteger::operator %= ( const LargeInteger & p_LargeInteger )
 {
+	return *this;
+}
+
+LargeInteger & LargeInteger::operator <<= ( const unsigned int p_Bits )
+{
+
+	for( unsigned int i = 0; i < m_Size; i++ )
+	{
+
+	}
+
+	return *this;
+}
+
+LargeInteger & LargeInteger::operator >>= ( const unsigned int p_Bits )
+{
+
 	return *this;
 }
 

@@ -88,6 +88,11 @@ public:
 	LargeInteger & operator *= ( const LargeInteger & p_LargeInteger );  // NOT WORKING
 	LargeInteger & operator /= ( const LargeInteger & p_LargeInteger );  // NOT WORKING
 	LargeInteger & operator %= ( const LargeInteger & p_LargeInteger );  // NOT WORKING
+
+
+	LargeInteger & operator <<= ( const unsigned int p_Bits );
+	LargeInteger & operator >>= ( const unsigned int p_Bits );
+
 	friend std::ostream & operator << ( std::ostream & os, const LargeInteger & p_LargeInteger );
 
 private:
