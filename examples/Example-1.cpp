@@ -35,7 +35,7 @@ int main( )
 	srand( time( NULL ) );
 
 	//LargeInteger a( 2,	123, 42, 0  );
-	LargeInteger b( 1,	2, 0, 0  );
+	//LargeInteger b( 1,	2, 0, 0  );
 	//LargeInteger largeInt_3( 2, 65535, 0 );
 
 /*
@@ -46,12 +46,17 @@ int main( )
 	}
 */
 
-	LargeInteger a( 4,	123, 65535, 4201 , 1024  );
+	LargeInteger a( 1, 256, 0 );
+	LargeInteger b( 1, 127, 0 );
 	std::cout << (a) << std::endl;
-	std::cout << (a <<= 32 ) << std::endl;
+	std::cout << (b) << std::endl;
+	std::cout << (a %= b) << std::endl;
+	//a.Shift( 1 );
+	//std::cout << (a) << std::endl;
+	/*std::cout << (a <<= 32 ) << std::endl;
 	std::cout << (a >>= 48 ) << std::endl;
 	std::cout << (a <<= 20 ) << std::endl;
-
+*/
 
 
 	//LargeInteger a( 4,	123, 4200, 0, 0  );

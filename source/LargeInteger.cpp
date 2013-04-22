@@ -93,7 +93,7 @@ LargeInteger::LargeInteger( const LargeInteger & p_LargeInteger ) :
 	m_pComponents( NULL ),
 	m_Size( 0 )
 {
-	if( Allocate( p_LargeInteger.m_Size ) )
+	if( !Allocate( p_LargeInteger.m_Size ) )
 	{
 		return;
 	}
@@ -254,7 +254,7 @@ LargeInteger::operator bool( ) const
 	}
 
 	// Check if all the components are 0
-	for( unsigned int i = 1; i < m_Size; i++ )
+	for( unsigned int i = 0; i < m_Size; i++ )
 	{
 		if( m_pComponents[ i ] != 0 )
 		{
@@ -274,7 +274,7 @@ bool LargeInteger::operator ! ( ) const
 	}
 
 	// Check if all the components are 0
-	for( unsigned int i = 1; i < m_Size; i++ )
+	for( unsigned int i = 0; i < m_Size; i++ )
 	{
 		if( m_pComponents[ i ] != 0 )
 		{
@@ -597,11 +597,17 @@ LargeInteger & LargeInteger::operator *= ( const LargeInteger & p_LargeInteger )
 
 LargeInteger & LargeInteger::operator /= ( const LargeInteger & p_LargeInteger )
 {
+	LargeInteger remainder( p_LargeInteger.m_Size );
+	LargeInteger dividend( *this );
+	Divide( dividend, p_LargeInteger, *this, remainder );
 	return *this;
 }
 
 LargeInteger & LargeInteger::operator %= ( const LargeInteger & p_LargeInteger )
 {
+	LargeInteger quotient( m_Size );
+	LargeInteger dividend( *this );
+	Divide( dividend, p_LargeInteger, quotient, *this );
 	return *this;
 }
 
@@ -762,6 +768,55 @@ bool LargeInteger::Allocate( const unsigned int p_Size )
 	m_pComponents = new unsigned short[ p_Size ];
 
 	return true;
+}
+
+void LargeInteger::Shift( unsigned int p_Bit )
+{
+	for( unsigned i = 0; i < m_Size; i++ )
+	{ 
+		unsigned long x = m_pComponents[ i ] << 1 | p_Bit; 
+		m_pComponents[ i ] = x; 
+		p_Bit = x >> 16; 
+	} 
+	if( p_Bit != 0 ) 
+	{
+		Overflow( );
+	}
+}
+
+void LargeInteger::Divide( const LargeInteger & p_Dividend, const LargeInteger & p_Divisor,
+		LargeInteger & p_Quotient, LargeInteger & p_Remainder )
+{
+	if( !p_Divisor )
+	{
+		Underflow();
+		return;
+	}
+
+	//p_Remainder = 0; 
+	//p_Quotient = 0;
+	p_Remainder.Clear( ); 
+	p_Quotient.Clear( );
+	unsigned i = p_Dividend.m_Size; 
+
+	while (i-- != 0)
+	{ 
+		unsigned bit = 16;
+		while ( bit-- != 0 ) 
+		{
+			p_Remainder.Shift( p_Dividend.m_pComponents[ i ] >> bit & 1); 
+			if ( p_Divisor <= p_Remainder) 
+			{ 
+				p_Quotient.Shift( 1 ); 
+
+				p_Remainder -= p_Divisor; 
+			} 
+			else
+			{
+				p_Quotient.Shift( false );
+			}
+		}
+	}
 }
 
 // Underflow and overflow functions that are called every time we reach any operator error.

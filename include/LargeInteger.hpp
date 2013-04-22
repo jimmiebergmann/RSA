@@ -99,8 +99,12 @@ private:
 
 	// Private functions
 	bool Allocate( const unsigned int p_Size );
+	void Shift( unsigned int p_Bit );
+	void Divide( const LargeInteger & p_Dividend, const LargeInteger & p_Divisor,
+		LargeInteger & p_Quotient, LargeInteger & p_Remainder );
 	void Underflow( );
 	void Overflow( );
+
 
 	// Private variable members
 	unsigned short * m_pComponents;
