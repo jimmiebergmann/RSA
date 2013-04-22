@@ -52,47 +52,66 @@ public:
 
 	// Public functions
 	void Clear( );
-	void PrintBinary( ) const;
+	void Copy( const LargeInteger & p_LargeInteger );
+	int Compare( const unsigned short p_Short ) const;
+	int Compare( const LargeInteger & p_LargeInteger ) const;
+	std::string GetString( const unsigned short p_Base ) const;
 
 	// Set functions
 	void SetComponent( const unsigned int p_Index, const unsigned short p_Value );
 
 	// Get functions
 	unsigned short GetComponent( const unsigned int p_Index ) const;
+	unsigned int GetSize( ) const;
 
 	// Operators
+	unsigned short operator [ ] ( unsigned int p_Index ) const; // Same as GetComponent( ... )
 	operator bool( ) const;
 	bool operator ! ( ) const;
+	void operator = ( const unsigned short p_Short );
 	void operator = ( const LargeInteger & p_LargeInteger );
 	bool operator == ( const unsigned short p_Short ) const;
 	bool operator == ( const LargeInteger & p_LargeInteger ) const;
 	bool operator != ( const unsigned short p_Short ) const;
 	bool operator != ( const LargeInteger & p_LargeInteger ) const;
-	bool operator > ( const unsigned short p_Short ) const;
+	bool operator >	( const unsigned short p_Short ) const;
 	bool operator > ( const LargeInteger & p_LargeInteger ) const;
 	bool operator >= ( const unsigned short p_Short ) const;
-	bool operator >= ( const LargeInteger & p_LargeInteger ) const; // NOT WORKING
-	bool operator < ( const unsigned short p_Short ) const;  // NOT WORKING
+	bool operator >= ( const LargeInteger & p_LargeInteger ) const;
+	bool operator < ( const unsigned short p_Short ) const;
 	bool operator < ( const LargeInteger & p_LargeInteger ) const;
-	bool operator <= ( const unsigned short p_Short ) const; // NOT WORKING
-	bool operator <= ( const LargeInteger & p_LargeInteger ) const; // NOT WORKING
-	LargeInteger operator + ( const LargeInteger & p_LargeInteger ) const;
+	bool operator <= ( const unsigned short p_Short ) const;
+	bool operator <= ( const LargeInteger & p_LargeInteger ) const;
+	LargeInteger & operator += ( const unsigned short p_Short );
 	LargeInteger & operator += ( const LargeInteger & p_LargeInteger );
-	LargeInteger operator - ( const LargeInteger & p_LargeInteger ) const; // NOT WORKING
-	LargeInteger & operator -= ( const LargeInteger & p_LargeInteger );  // NOT WORKING
-	LargeInteger operator * ( const LargeInteger & p_LargeInteger ) const; // NOT WORKING
+	LargeInteger & operator -= ( const unsigned short p_Short );
+	LargeInteger & operator -= ( const LargeInteger & p_LargeInteger );
+
 	LargeInteger & operator *= ( const LargeInteger & p_LargeInteger );  // NOT WORKING
-	LargeInteger operator / ( const LargeInteger & p_LargeInteger ) const; // NOT WORKING
-	LargeInteger & operator /= ( const LargeInteger & p_LargeInteger );  // NOT WORKING
-	LargeInteger operator % ( const LargeInteger & p_LargeInteger ) const; // NOT WORKING
-	LargeInteger & operator %= ( const LargeInteger & p_LargeInteger );  // NOT WORKING
+	void operator /= ( const unsigned short & p_Short );
+	LargeInteger & operator /= ( const LargeInteger & p_LargeInteger );
+	unsigned short operator % ( const unsigned short p_Short );
+	LargeInteger & operator %= ( const LargeInteger & p_LargeInteger );
+
+
+	LargeInteger & operator <<= ( const unsigned int p_Bits );
+	LargeInteger & operator >>= ( const unsigned int p_Bits );
+
 	friend std::ostream & operator << ( std::ostream & os, const LargeInteger & p_LargeInteger );
 
 private:
 
 	// Private functions
 	bool Allocate( const unsigned int p_Size );
-	void Copy( const LargeInteger & p_LargeInteger );
+	void Shift( unsigned int p_Bit );
+	void Divide( const LargeInteger & p_Dividend, const LargeInteger & p_Divisor,
+		LargeInteger & p_Quotient, LargeInteger & p_Remainder );
+	void Divide( LargeInteger & p_Divider, const unsigned short p_Divisor,
+		unsigned short & p_Remainder );
+	unsigned short Remainder( unsigned short p_Short ) const;
+	void Underflow( );
+	void Overflow( );
+
 
 	// Private variable members
 	unsigned short * m_pComponents;
