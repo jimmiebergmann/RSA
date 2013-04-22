@@ -25,6 +25,7 @@
 
 #include "LargeInteger.hpp"
 #include <algorithm>
+#include <cmath>
 #include <stdlib.h>
 
 // Constructors / descructors
@@ -92,7 +93,7 @@ LargeInteger::LargeInteger( const LargeInteger & p_LargeInteger ) :
 	m_pComponents( NULL ),
 	m_Size( 0 )
 {
-	if( Allocate( p_LargeInteger.m_Size ) )
+	if( !Allocate( p_LargeInteger.m_Size ) )
 	{
 		return;
 	}
@@ -122,22 +123,126 @@ void LargeInteger::Clear( )
 	}
 }
 
-void LargeInteger::PrintBinary( ) const
+void LargeInteger::Copy( const LargeInteger & p_LargeInteger )
 {
-	if( m_Size == 0 )
+	// Make sure we don't go out of bound by calculating the right size.
+	unsigned int componentsToCopy = ( m_Size >= p_LargeInteger.m_Size ) ? p_LargeInteger.m_Size : m_Size ;
+
+	// You might lose data if the parameter large integer is larger in allocation size.
+	for( unsigned int i = 0; i < componentsToCopy; i++ )
 	{
-		std::cout << "0";
-		return;
+		m_pComponents[ i ] = p_LargeInteger.m_pComponents[ i ];
+	}
+}
+
+int LargeInteger::Compare( const unsigned short p_Short ) const
+{
+	for( unsigned int i = 1; i < m_Size; i++ )
+	{
+		if( m_pComponents[ i ] != 0 )
+		{
+			return 1;
+		}
 	}
 
-	for( int i = m_Size - 1; i >= 0; i-- )
+	if( m_pComponents[ 0 ] > p_Short )
 	{
-		for( int j = (sizeof( unsigned short ) * 8) - 1; j >= 0; j-- )
-		{
-			std::cout << CheckBit( m_pComponents[ i ], j );
-		}
-		std::cout << " ";
+		return 1;
 	}
+	else if( m_pComponents[ 0 ] < p_Short )
+	{
+		return -1;
+	}
+
+	// They are equal
+	return 0;
+}
+
+int LargeInteger::Compare( const LargeInteger & p_LargeInteger ) const
+{
+	// Let's calculate how many components we want to compare with each other.
+	unsigned int i = 0;
+
+	if( m_Size == p_LargeInteger.m_Size )
+	{
+		i = m_Size - 1;
+	}
+	else if( m_Size > p_LargeInteger.m_Size )
+	{
+		// Calculate i + check if the number is larger than the param value
+		for( i = m_Size - 1; i >= p_LargeInteger.m_Size; i-- )
+		{
+			if( m_pComponents[ i ] != 0 )
+			{
+				return 1;
+			}
+		}
+	}
+	else if( m_Size < p_LargeInteger.m_Size )
+	{
+		// Calculate i + check if the number is lower than the param value
+		for( i = p_LargeInteger.m_Size - 1; i >= m_Size; i-- )
+		{
+			if( p_LargeInteger.m_pComponents[ i ] != 0 )
+			{
+				return -1;
+			}
+		}
+	}
+
+	while( true )
+	{
+		if( m_pComponents[ i ] > p_LargeInteger.m_pComponents[ i ] )
+		{
+			return 1;
+		}
+		else if( m_pComponents[ i ] < p_LargeInteger.m_pComponents[ i ] )
+		{
+			return -1;
+		}
+
+		// The large integers are obviously equal to each other.
+		if( i == 0 )
+		{
+			return 0;
+		}
+
+		// Decrease i
+		i--;
+	}
+
+	return 0;
+}
+
+
+std::string LargeInteger::GetString( const unsigned short p_Base ) const
+{
+	std::string Buffer = "";
+
+	// The if the base is valid
+	if( p_Base < 2 || p_Base > 16 )
+	{
+		return Buffer;
+	}
+
+	// Reserve space here ?
+	// ...
+
+	LargeInteger Quotient = *this;
+	LargeInteger Rest = Quotient;
+
+	// Translate the numbers to string
+	do
+	{
+		Rest = Quotient % p_Base;
+		Buffer += "0123456789abcdef"[ Rest.GetComponent( 0 ) ];
+		Quotient /= p_Base;
+	}
+	while( Quotient );
+
+	// Reverse and return the buffer
+	std::reverse( Buffer.begin( ), Buffer.end( ) );
+	return Buffer;
 }
 
 // Set functions
@@ -160,17 +265,27 @@ unsigned short LargeInteger::GetComponent( const unsigned int p_Index ) const
 	return m_pComponents[ p_Index ];
 }
 
+unsigned int LargeInteger::GetSize( ) const
+{
+	return m_Size;
+}
+
 // Operators
+unsigned short LargeInteger::operator [ ] ( unsigned int p_Index ) const
+{
+	return GetComponent( p_Index );
+}
+
 LargeInteger::operator bool( ) const
 {
 	// Make sure the large integer is allocated
 	if( m_Size == 0 )
 	{
-		return true;
+		return false;
 	}
 
 	// Check if all the components are 0
-	for( unsigned int i = 1; i < m_Size; i++ )
+	for( unsigned int i = 0; i < m_Size; i++ )
 	{
 		if( m_pComponents[ i ] != 0 )
 		{
@@ -190,7 +305,7 @@ bool LargeInteger::operator ! ( ) const
 	}
 
 	// Check if all the components are 0
-	for( unsigned int i = 1; i < m_Size; i++ )
+	for( unsigned int i = 0; i < m_Size; i++ )
 	{
 		if( m_pComponents[ i ] != 0 )
 		{
@@ -200,6 +315,16 @@ bool LargeInteger::operator ! ( ) const
 
 	return true;
 }
+
+void LargeInteger::operator = ( const unsigned short p_Short )
+{
+	if( m_Size )
+	{
+		Clear( );
+		m_pComponents[ 0 ] = p_Short;
+	}
+}
+
 void LargeInteger::operator = ( const LargeInteger & p_LargeInteger )
 {
 	Copy( p_LargeInteger );
@@ -207,326 +332,111 @@ void LargeInteger::operator = ( const LargeInteger & p_LargeInteger )
 
 bool LargeInteger::operator == ( const unsigned short p_Short ) const
 {
-	// Make sure the large integer is allocated
-	if( m_Size == 0 )
-	{
-		return false;
-	}
-	
-	// The first component should be equal to the param
-	if( m_pComponents[ 0 ] != p_Short )
-	{
-		return false;
-	}
-
-	// Now let's make sure all the other components are 0
-	for( unsigned int i = 1; i < m_Size; i++ )
-	{
-		if( m_pComponents[ i ] != 0 )
-		{
-			return false;
-		}
-	}
-
-	return true;
-
+	return Compare( p_Short ) == 0;
 }
 
 bool LargeInteger::operator == ( const LargeInteger & p_LargeInteger ) const
 {
-	// Make sure the components are allocated
-	if( m_Size == 0 || p_LargeInteger.m_Size == 0 )
-	{
-		return false;
-	}
-
-	// Is the size of the two numbers the same?
-	if( m_Size == p_LargeInteger.m_Size )
-	{
-		for( unsigned int i = 0; i < m_Size; i++ )
-		{
-			if( m_pComponents[ i ] != p_LargeInteger.m_pComponents[ i ] )
-			{
-				return false;
-			}
-		}
-
-		return true;
-	}
-	else if( m_Size > p_LargeInteger.m_Size )
-	{
-		// Make sure all the values are equal to each other
-		for( unsigned int i = 0; i < p_LargeInteger.m_Size; i++ )
-		{
-			if( m_pComponents[ i ] != p_LargeInteger.m_pComponents[ i ] )
-			{
-				return false;
-			}
-		}
-
-		// Now let's make sure all the other components are 0
-		for( unsigned int i = p_LargeInteger.m_Size; i < m_Size; i++ )
-		{
-			if( m_pComponents[ i ] != 0 )
-			{
-				return false;
-			}
-		}
-
-		return true;
-	}
-	else if( m_Size < p_LargeInteger.m_Size )
-	{
-		// Make sure all the values are equal to each other
-		for( unsigned int i = 0; i < m_Size; i++ )
-		{
-			if( m_pComponents[ i ] != p_LargeInteger.m_pComponents[ i ] )
-			{
-				return false;
-			}
-		}
-
-		// Now let's make sure all the other components are 0
-		for( unsigned int i = m_Size; i < p_LargeInteger.m_Size; i++ )
-		{
-			if( p_LargeInteger.m_pComponents[ i ] != 0 )
-			{
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-
-	// Will never reach this, but I don't like warnings.
-	return false;
+	return Compare( p_LargeInteger ) == 0;
 }
 
 bool LargeInteger::operator != ( const unsigned short p_Short ) const
 {
-	// Make sure the components are allocated
-	if( m_Size == 0 )
-	{
-		return false;
-	}
-
-	// Check the first component
-	if( m_pComponents[ 0 ] != p_Short )
-	{
-		return false;
-	}
-
-	// Now let's make sure all the other components are 0
-	for( unsigned int i = 1; i < m_Size; i++ )
-	{
-		if( m_pComponents[ i ] != 0 )
-		{
-			return false;
-		}
-	}
-	
-	return true;
+	return Compare( p_Short ) != 0;
 }
 
 bool LargeInteger::operator != ( const LargeInteger & p_LargeInteger ) const
 {
-	// Make sure the large integer is allocated
-	if( m_Size == 0 || p_LargeInteger.m_Size == 0 )
-	{
-		return false;
-	}
-
-	return false;
+	return Compare( p_LargeInteger ) != 0;
 }
 
 bool LargeInteger::operator > ( const unsigned short p_Short ) const
 {
-	// Make sure the large integer is allocated
-	if( m_Size == 0 )
-	{
-		return false;
-	}
-
-	// Check if any of the last components isn't 0
-	for( unsigned int i = 1; i < m_Size; i++ )
-	{
-		if( m_pComponents[ i ] != 0 )
-		{
-			return true;
-		}
-	}
-
-	
-	// Check the first component against the value param
-	if( m_pComponents[ 0 ] > p_Short )
-	{
-		return true;
-	}
-
-	return false;
+	return Compare( p_Short ) > 0;
 }
-
 bool LargeInteger::operator > ( const LargeInteger & p_LargeInteger ) const
 {
-	// Make sure the large integer is allocated
-	if( m_Size == 0 || p_LargeInteger.m_Size == 0 )
-	{
-		return false;
-	}
-
-	if( m_Size == p_LargeInteger.m_Size )
-	{
-		for( unsigned int i = 0; i < m_Size; i++ )
-		{
-			if( m_pComponents[ i ] > p_LargeInteger.m_pComponents[ i ] )
-			{
-				return true;
-			}
-		}
-		
-		return false;
-	}
-	else if( m_Size > p_LargeInteger.m_Size )
-	{
-		// Check if the last values is larger than 0
-		for( int i = m_Size - 1; i >= p_LargeInteger.m_Size; i-- )
-		{
-			if( m_pComponents[ i ]  != 0 )
-			{
-				return true;
-			}
-		}
-
-		// Now let's check all the other ones components
-		for( int i = p_LargeInteger.m_Size - 1; i >= 0; i-- )
-		{
-			if( m_pComponents[ i ] > p_LargeInteger.m_pComponents[ i ] )
-			{
-				return true;
-			}
-		}
-
-		return false;
-	}
-	else if( m_Size < p_LargeInteger.m_Size )
-	{
-		// Make sure that all the last components are == 0.
-		for( int i = p_LargeInteger.m_Size - 1; i >= m_Size; i-- )
-		{
-			if( p_LargeInteger.m_pComponents[ i ] != 0 )
-			{
-				return false;
-			}
-		}
-
-		// Now let's check all the other ones components
-		for( int i = m_Size - 1; i >= 0; i-- )
-		{
-			if( p_LargeInteger.m_pComponents[ i ] > m_pComponents[ i ] )
-			{
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	// Will never reach this, but I don't like warnings.
-	return false;
+	return Compare( p_LargeInteger ) > 0;
 }
 
 bool LargeInteger::operator >= ( const unsigned short p_Short ) const
 {
-	// Make sure the large integer is allocated
-	if( m_Size == 0 )
-	{
-		return false;
-	}
-
-	// Check if any of the last components isn't 0
-	for( unsigned int i = 1; i < m_Size; i++ )
-	{
-		if( m_pComponents[ i ] != 0 )
-		{
-			return true;
-		}
-	}
-
-	// Check the first component against the value param
-	if( m_pComponents[ 0 ] >= p_Short )
-	{
-		return true;
-	}
-
-	return false;
+	return Compare( p_Short ) >= 0;
 }
 
 bool LargeInteger::operator >= ( const LargeInteger & p_LargeInteger ) const
 {
-	return false;
+	return Compare( p_LargeInteger ) >= 0;
 }
 
 bool LargeInteger::operator < ( const unsigned short p_Short ) const
 {
-	return false;
+	return Compare( p_Short ) < 0;
 }
 
 bool LargeInteger::operator < ( const LargeInteger & p_LargeInteger ) const
 {
-	// Why not reuse the > operator for this task?
-	return  p_LargeInteger > *this;
+	return Compare( p_LargeInteger ) < 0;
 }
 
 bool LargeInteger::operator <= ( const unsigned short p_Short ) const
 {
-	return false;
+	return Compare( p_Short ) <= 0;
 }
 
 bool LargeInteger::operator <= ( const LargeInteger & p_LargeInteger ) const
 {
-	return false;
+	return Compare( p_LargeInteger ) <= 0;
 }
 
-LargeInteger LargeInteger::operator + ( const LargeInteger & p_LargeInteger ) const
+LargeInteger & LargeInteger::operator += ( const unsigned short p_Short )
 {
-	LargeInteger newInteger( m_Size );
-	unsigned int overflow = 0;
+	// Make sure the large integer is allocated
+	if( m_Size == 0 )
+	{
+		return *this;
+	}
 
-	for( unsigned int i = 0; i < m_Size; i++ )
+	// Calculate the overflow is any.
+	unsigned int overflow = static_cast<unsigned int>( m_pComponents[ 0 ] ) +
+			static_cast<unsigned int>( p_Short );
+
+	// Set the components( just the first 16 bits )
+	m_pComponents[ 0 ] = overflow & 0xFFFF;
+
+	// Calculate the new overflow by bitshift 16 bits
+	overflow = overflow >> 16;
+
+	// Handle the overflow
+	for( unsigned int i = 1; i < m_Size; i++ )
 	{
 		// Calculate the new current component by adding the two componets
 		// plus the last overflow. (Still use the overflow variable fort this, easier)
-		overflow = static_cast<unsigned int>( m_pComponents[ i ] ) +
-			static_cast<unsigned int>( p_LargeInteger.m_pComponents[ i ] ) +
-			overflow;
+		overflow = static_cast<unsigned int>( m_pComponents[ i ] ) + overflow;
 
 		// Set the components( just the first 16 bits )
-		newInteger.m_pComponents[ i ] = overflow & 0xFFFF;
+		m_pComponents[ i ] = overflow & 0xFFFF;
 
 		// Calculate the new overflow by bitshift 16 bits
 		overflow = overflow >> 16;
 	}
 
-	// We do not allow overflow at all. We should set all components
-	// to the max value if there's a overflow.
+	// Handle final overflow
 	if( overflow )
 	{
-		for( unsigned int i = 0; i < m_Size; i++ )
-		{
-			newInteger.m_pComponents[ i ] = 0xFFFF;
-		}
+		Overflow( );
+		return *this;
 	}
-	
-	// Return a new large integer
-	return LargeInteger( newInteger.m_Size, newInteger.m_pComponents );
+
+	return *this;
 }
 
 LargeInteger & LargeInteger::operator += ( const LargeInteger & p_LargeInteger )
 {
 	unsigned int overflow = 0;
+	unsigned int Size = ( m_Size < p_LargeInteger.m_Size ) ? m_Size : p_LargeInteger.m_Size;
 
-	for( unsigned int i = 0; i < m_Size; i++ )
+	for( unsigned int i = 0; i < Size; i++ )
 	{
 		// Calculate the new current component by adding the two componets
 		// plus the last overflow. (Still use the overflow variable fort this, easier)
@@ -541,143 +451,295 @@ LargeInteger & LargeInteger::operator += ( const LargeInteger & p_LargeInteger )
 		overflow = overflow >> 16;
 	}
 
-	// We do not allow overflow at all. We should set all components
-	// to the max value if there's a overflow.
-	if( overflow )
+	// So now we have to fill the rest of the bits with something.
+	if( m_Size > p_LargeInteger.m_Size )
 	{
-		for( unsigned int i = 0; i < m_Size; i++ )
+		for( unsigned int i = Size; i < m_Size; i++ )
 		{
-			m_pComponents[ i ] = 0xFFFF;
+			// Calculate the new current component by adding the two componets
+			// plus the last overflow. (Still use the overflow variable fort this, easier)
+			overflow = static_cast<unsigned int>( m_pComponents[ i ] ) + overflow;
+
+			// Set the components( just the first 16 bits )
+			m_pComponents[ i ] = overflow & 0xFFFF;
+
+			// Calculate the new overflow by bitshift 16 bits
+			overflow = overflow >> 16;
+		}
+	}
+	else if( m_Size < p_LargeInteger.m_Size )
+	{
+		for( unsigned int i = Size; i < p_LargeInteger.m_Size; i++ )
+		{
+			if( p_LargeInteger.m_pComponents[ i ] != 0 )
+			{
+				Overflow( );
+				return *this;
+			}
 		}
 	}
 
+	// Handle final overflow
+	if( overflow )
+	{
+		Overflow( );
+		return *this;
+	}
+	
 	return *this;
 }
 
-LargeInteger LargeInteger::operator - ( const LargeInteger & p_LargeInteger ) const
+LargeInteger & LargeInteger::operator -= ( const unsigned short p_Short )
 {
+	// Make sure the large integer is allocated
+	if( m_Size == 0 )
+	{
+		return *this;
+	}
+
+	unsigned short borrow = 0;
+	unsigned short currentComponent = m_pComponents[ 0 ];
+	m_pComponents[ 0 ] = currentComponent - p_Short;
+
+	borrow = static_cast< unsigned short >(
+		p_Short > currentComponent );
+
+	// Try to fix the borrow
+	for( unsigned int i = 1; i < m_Size; i++ )
+	{
+		if( borrow == 0 )
+		{	
+			return *this;
+		}
+
+		currentComponent = m_pComponents[ i ];
+		m_pComponents[ i ] = currentComponent - borrow;
+		
+		borrow = static_cast< unsigned short >(
+			m_pComponents[ i ] > currentComponent );
+	}
+
+	// Handle final underflow
+	if( borrow )
+	{
+		Underflow( );
+		return *this;
+	}
+
 	return *this;
 }
 
 LargeInteger & LargeInteger::operator -= ( const LargeInteger & p_LargeInteger )
 {
 	// Check if the param value is larger than the current one.
-	// We do this by using the > operator.
-	// NOT FAST AT ALL!
-	if( p_LargeInteger >= *this )
+	for( unsigned int i = m_Size; i < p_LargeInteger.m_Size; i++ )
 	{
-		Clear( );
+		if( p_LargeInteger.m_pComponents[ i ] != 0 )
+		{
+			Underflow( );
+			return *this;
+		}
+	}
+
+	unsigned short borrow = 0;
+	unsigned short currentComponent = 0;
+	unsigned int Size = ( m_Size < p_LargeInteger.m_Size ) ? m_Size : p_LargeInteger.m_Size;
+
+	for( unsigned int i = 0; i < Size; i++ )
+	{
+		currentComponent = m_pComponents[ i ];
+		m_pComponents[ i ] = currentComponent - p_LargeInteger.m_pComponents[ i ] - borrow;
+
+		borrow = static_cast< unsigned short >(
+			p_LargeInteger.m_pComponents[ i ] > currentComponent );
+	
+	}
+
+	if( m_Size > p_LargeInteger.m_Size )
+	{
+		// Calculate the rest.
+		for( unsigned int i = p_LargeInteger.m_Size; i < m_Size; i++ )
+		{
+			if( borrow == 0 )
+			{	
+				return *this;
+			}
+
+			currentComponent = m_pComponents[ i ];
+			m_pComponents[ i ] = currentComponent - borrow;
+			
+			borrow = static_cast< unsigned short >(
+				m_pComponents[ i ] > currentComponent );
+		}
+	}
+
+	// Handle final underflow
+	if( borrow )
+	{
+		Underflow( );
 		return *this;
 	}
 
-	/*bool smallerNumber = false;
-
-	for( int i = m_Size - 1; i >= 0 ; i-- )
-	{
-	}*/
-
-
-/*
-	int a = 21;
-
-	std::cout << "BIT: ";
-	for( int i = 31; i >= 0; i-- )
-	{
-		std::cout << CheckBit( a, i );
-	}
-	std::cout << std::endl << std::endl;
-
-*/
-/*
-	int overflow = 0;
-
-	for( int i = m_Size - 1; i >= 0 ; i-- )
-	{
-		// Calculate the new current component by subtracting the two componets
-		// plus adding the last overflow. (Still use the overflow variable fort this, easier)
-		overflow = static_cast<int>( m_pComponents[ i ] ) -
-			static_cast<int>( p_LargeInteger.m_pComponents[ i ] ) +
-			overflow;
-
-		if( overflow > 0 )
-		{
-			m_pComponents[ i ] = overflow & 0xFFFF;
-		}
-		else
-		{
-			m_pComponents[ i ] = 0;
-			overflow = 0xFFFF + overflow;
-		}
-
-	}
-*/
-	return *this;
-}
-
-LargeInteger LargeInteger::operator * ( const LargeInteger & p_LargeInteger ) const
-{
 	return *this;
 }
 
 LargeInteger & LargeInteger::operator *= ( const LargeInteger & p_LargeInteger )
 {
+	// !NOTE! !NOTE! !NOTE! !NOTE! !NOTE!
+	// Use smart pointer here please?!
+
+	// Make sure the large integers are allocated
+	if( m_Size == 0 || p_LargeInteger.m_Size == 0 )
+	{
+		return *this;
+	}
+
+	// Dublicate the components into an array called "miltiplier"
+	unsigned int i;
+	unsigned short * multiplier = new unsigned short[ m_Size ];
+	
+	for( i = 0; i < m_Size; i++ )
+	{
+		multiplier[ i ] = m_pComponents[ i ];
+		m_pComponents[ i ] = 0;
+	}
+
+	// Multiply
+	for( i = 0; i < m_Size; i++ )
+	{
+		for( unsigned int j = 0; j < p_LargeInteger.m_Size; j++ )
+		{
+			unsigned long product = multiplier[ i ] * p_LargeInteger.m_pComponents[ j ];
+			unsigned int k = i + j;
+
+			while( product != 0 )
+			{
+				if( k >= m_Size )
+				{
+					delete [ ] multiplier;
+					Overflow( );
+					return *this;
+				}
+
+				product += m_pComponents[ k ];
+				m_pComponents[ k ] = product;
+				product >>= 16;
+				k++;
+			}
+		}
+	}
+
+
+	// Delete the allocated data
+	delete [ ] multiplier;
+
 	return *this;
 }
 
-LargeInteger LargeInteger::operator / ( const LargeInteger & p_LargeInteger ) const
+void LargeInteger::operator /= ( const unsigned short & p_Short )
 {
-	return *this;
+	unsigned short remainder = 0;
+	Divide( *this, p_Short, remainder );
 }
 
 LargeInteger & LargeInteger::operator /= ( const LargeInteger & p_LargeInteger )
 {
+	LargeInteger remainder( p_LargeInteger.m_Size );
+	LargeInteger dividend( *this );
+	Divide( dividend, p_LargeInteger, *this, remainder );
 	return *this;
 }
 
-LargeInteger LargeInteger::operator % ( const LargeInteger & p_LargeInteger ) const
+unsigned short LargeInteger::operator % ( const unsigned short p_Short )
 {
-	return *this;
+	return Remainder( p_Short );
 }
 
 LargeInteger & LargeInteger::operator %= ( const LargeInteger & p_LargeInteger )
 {
+	LargeInteger quotient( m_Size );
+	LargeInteger dividend( *this );
+	Divide( dividend, p_LargeInteger, quotient, *this );
+	return *this;
+}
+
+LargeInteger & LargeInteger::operator <<= ( const unsigned int p_Bits )
+{
+	if( m_Size == 0 )
+	{
+		return *this;
+	}
+
+	// Create an array which is the copy of 
+	unsigned short * copy = new unsigned short[ m_Size ];
+	for( unsigned int i = 0; i < m_Size; i++ )
+	{
+		copy[ i ] = m_pComponents[ i ];
+	}
+
+	// Calculate the start of the bits
+	unsigned int startIndex = static_cast< unsigned int >( floor( (double)p_Bits / 16.0f ) );
+	unsigned int startRest = p_Bits % 16;
+	unsigned int overflow = 0;
+
+	// Zero all the bits that are "new"
+	for( unsigned int i = 0; i < startIndex; i++ )
+	{
+		m_pComponents[ i ] = 0;
+	}
+
+	// Let's move the bits
+	for( unsigned int i = 0; ( i + startIndex ) < m_Size; i++ )
+	{
+		m_pComponents[ i + startIndex ] = (copy[ i ] << startRest) | overflow;
+		overflow = copy[ i ] >> ( 16 - startRest );
+	}
+
+	// delete the copy.
+	delete [ ] copy;
+	return *this;
+}
+
+LargeInteger & LargeInteger::operator >>= ( const unsigned int p_Bits )
+{
+	if( m_Size == 0 )
+	{
+		return *this;
+	}
+
+	// Create an array which is the copy of 
+	unsigned short * copy = new unsigned short[ m_Size ];
+	for( unsigned int i = 0; i < m_Size; i++ )
+	{
+		copy[ i ] = m_pComponents[ i ];
+	}
+
+	// Calculate the start of the bits
+	int startIndex = static_cast< unsigned int >( floor( (double)p_Bits / 16.0f ) );
+	unsigned int startRest = p_Bits % 16;
+	unsigned int overflow = 0;
+
+	// Zero all the bits that are "new"
+	for( int i = m_Size - 1; i > m_Size - 1 - startIndex; i-- )
+	{
+		m_pComponents[ i ] = 0;
+	}
+
+	// Let's move the bits
+	for( int i = m_Size - 1; ( i - startIndex ) >= 0; i-- )
+	{
+		m_pComponents[ i - startIndex ] = (copy[ i ] >> startRest) | overflow;
+		overflow = copy[ i ] << ( 16 - startRest );
+	}
+
+	// delete the copy
+	delete [ ] copy;
 	return *this;
 }
 
 std::ostream & operator << ( std::ostream & os, const LargeInteger & p_LargeInteger )
 {
-	// a bad way of doing this probably but it's working for now.
-
-	if( p_LargeInteger.m_Size == 0 )
-	{
-		os << "0";
-		return os;
-	}
-
-	std::string buffer = "";
-
-	for( int i = p_LargeInteger.m_Size - 1; i >= 0; i-- )
-	{
-		for( int j = (sizeof( unsigned short ) * 8) - 1; j >= 0; j-- )
-		{
-			bool bit = static_cast< bool >( CheckBit( p_LargeInteger.m_pComponents[ i ], j ) );
-			
-			// Add the bits to the buffer
-			if( bit )
-			{
-				buffer += "1";
-			}
-			else
-			{
-				buffer += "0";
-			}
-		}
-		buffer += " ";
-	}
-
-	
-	os << buffer;
-	return os;
+	return os << p_LargeInteger.GetString( 10 );
 }
 
 /*
@@ -729,14 +791,105 @@ bool LargeInteger::Allocate( const unsigned int p_Size )
 	return true;
 }
 
-void LargeInteger::Copy( const LargeInteger & p_LargeInteger )
+void LargeInteger::Shift( unsigned int p_Bit )
 {
-	// Make sure we don't go out of bound by calculating the right size.
-	unsigned int componentsToCopy = ( m_Size >= p_LargeInteger.m_Size ) ? p_LargeInteger.m_Size : m_Size ;
-
-	// You might lose data if the parameter large integer is larger in allocation size.
-	for( unsigned int i = 0; i < componentsToCopy; i++ )
+	for( unsigned i = 0; i < m_Size; i++ )
+	{ 
+		unsigned long x = m_pComponents[ i ] << 1 | p_Bit; 
+		m_pComponents[ i ] = x; 
+		p_Bit = x >> 16; 
+	} 
+	if( p_Bit != 0 ) 
 	{
-		m_pComponents[ i ] = p_LargeInteger.m_pComponents[ i ];
+		Overflow( );
+	}
+}
+
+void LargeInteger::Divide( const LargeInteger & p_Dividend, const LargeInteger & p_Divisor,
+		LargeInteger & p_Quotient, LargeInteger & p_Remainder )
+{
+	if( !p_Divisor )
+	{
+		Underflow();
+		return;
+	}
+
+	p_Remainder.Clear( ); 
+	p_Quotient.Clear( );
+	unsigned i = p_Dividend.m_Size; 
+
+	while (i-- != 0)
+	{ 
+		unsigned bit = 16;
+		while ( bit-- != 0 ) 
+		{
+			p_Remainder.Shift( p_Dividend.m_pComponents[ i ] >> bit & 1); 
+			if ( p_Divisor <= p_Remainder) 
+			{ 
+				p_Quotient.Shift( 1 ); 
+
+				p_Remainder -= p_Divisor; 
+			} 
+			else
+			{
+				p_Quotient.Shift( false );
+			}
+		}
+	}
+}
+
+void LargeInteger::Divide( LargeInteger & p_Divider, const unsigned short p_Divisor,
+	unsigned short & p_Remainder )
+{
+	// Make sure we don't divide by 0
+	if( p_Divisor == 0 )
+	{
+		return;
+	}
+
+	unsigned int i = p_Divider.m_Size;
+	p_Remainder = 0;
+
+	while( i-- != 0 )
+	{
+		unsigned long divided = ( unsigned long )( p_Remainder ) << 16 |
+			( unsigned long )( p_Divider.m_pComponents[ i ] );
+
+		p_Divider.m_pComponents[i] = divided / p_Divisor;
+		p_Remainder = divided % ( unsigned long )( p_Divisor );
+	}
+
+}
+
+unsigned short LargeInteger::Remainder( unsigned short p_Short ) const
+{
+	unsigned int i = m_Size;
+	unsigned short rem = 0;
+
+	while( i-- != 0 )
+	{
+		unsigned long divided = ( unsigned long )( rem ) << 16 |
+			( unsigned long )( m_pComponents[ i ] );
+
+		rem = divided % ( unsigned long )( p_Short );
+	}
+
+	return rem;
+}
+
+// Underflow and overflow functions that are called every time we reach any operator error.
+void LargeInteger::Underflow( )
+{
+	for( unsigned int i = 0; i < m_Size; i++ )
+	{
+		m_pComponents[ i ] = 0;
+	}
+}
+
+void LargeInteger::Overflow( )
+{
+	for( unsigned int i = 0; i < m_Size; i++ )
+	{
+		m_pComponents[ i ] = 0xFFFF;
 	}
 }
