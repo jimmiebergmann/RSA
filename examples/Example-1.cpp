@@ -46,11 +46,16 @@ int main( )
 	}
 */
 
-	LargeInteger a( 1, 256, 0 );
-	LargeInteger b( 1, 127, 0 );
-	std::cout << (a) << std::endl;
-	std::cout << (b) << std::endl;
-	std::cout << (a %= b) << std::endl;
+	unsigned int size = 1024 / 16;
+	LargeInteger a( size );
+
+	a.SetComponent( 0, 256 );
+	for( unsigned int i = 1; i < size; i++ )
+	{
+		a.SetComponent( i, 127 );
+	}
+	std::cout << a << std::endl;
+
 	//a.Shift( 1 );
 	//std::cout << (a) << std::endl;
 	/*std::cout << (a <<= 32 ) << std::endl;

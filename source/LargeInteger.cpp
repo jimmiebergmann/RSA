@@ -214,6 +214,37 @@ int LargeInteger::Compare( const LargeInteger & p_LargeInteger ) const
 	return 0;
 }
 
+
+std::string LargeInteger::GetString( const unsigned short p_Base ) const
+{
+	std::string Buffer = "";
+
+	// The if the base is valid
+	if( p_Base < 2 || p_Base > 16 )
+	{
+		return Buffer;
+	}
+
+	// Reserve space here ?
+	// ...
+
+	LargeInteger Quotient = *this;
+	LargeInteger Rest = Quotient;
+
+	// Translate the numbers to string
+	do
+	{
+		Rest = Quotient % p_Base;
+		Buffer += "0123456789abcdef"[ Rest.GetComponent( 0 ) ];
+		Quotient /= p_Base;
+	}
+	while( Quotient );
+
+	// Reverse and return the buffer
+	std::reverse( Buffer.begin( ), Buffer.end( ) );
+	return Buffer;
+}
+
 // Set functions
 void LargeInteger::SetComponent( const unsigned int p_Index, const unsigned short p_Component )
 {
@@ -284,6 +315,16 @@ bool LargeInteger::operator ! ( ) const
 
 	return true;
 }
+
+void LargeInteger::operator = ( const unsigned short p_Short )
+{
+	if( m_Size )
+	{
+		Clear( );
+		m_pComponents[ 0 ] = p_Short;
+	}
+}
+
 void LargeInteger::operator = ( const LargeInteger & p_LargeInteger )
 {
 	Copy( p_LargeInteger );
@@ -595,12 +636,23 @@ LargeInteger & LargeInteger::operator *= ( const LargeInteger & p_LargeInteger )
 	return *this;
 }
 
+void LargeInteger::operator /= ( const unsigned short & p_Short )
+{
+	unsigned short remainder = 0;
+	Divide( *this, p_Short, remainder );
+}
+
 LargeInteger & LargeInteger::operator /= ( const LargeInteger & p_LargeInteger )
 {
 	LargeInteger remainder( p_LargeInteger.m_Size );
 	LargeInteger dividend( *this );
 	Divide( dividend, p_LargeInteger, *this, remainder );
 	return *this;
+}
+
+unsigned short LargeInteger::operator % ( const unsigned short p_Short )
+{
+	return Remainder( p_Short );
 }
 
 LargeInteger & LargeInteger::operator %= ( const LargeInteger & p_LargeInteger )
@@ -687,38 +739,7 @@ LargeInteger & LargeInteger::operator >>= ( const unsigned int p_Bits )
 
 std::ostream & operator << ( std::ostream & os, const LargeInteger & p_LargeInteger )
 {
-	// a bad way of doing this probably but it's working for now.
-
-	if( p_LargeInteger.m_Size == 0 )
-	{
-		os << "0";
-		return os;
-	}
-
-	std::string buffer = "";
-
-	for( int i = p_LargeInteger.m_Size - 1; i >= 0; i-- )
-	{
-		for( int j = (sizeof( unsigned short ) * 8) - 1; j >= 0; j-- )
-		{
-			bool bit = static_cast< bool >( CheckBit( p_LargeInteger.m_pComponents[ i ], j ) );
-			
-			// Add the bits to the buffer
-			if( bit )
-			{
-				buffer += "1";
-			}
-			else
-			{
-				buffer += "0";
-			}
-		}
-		buffer += " ";
-	}
-
-	
-	os << buffer;
-	return os;
+	return os << p_LargeInteger.GetString( 10 );
 }
 
 /*
@@ -793,8 +814,6 @@ void LargeInteger::Divide( const LargeInteger & p_Dividend, const LargeInteger &
 		return;
 	}
 
-	//p_Remainder = 0; 
-	//p_Quotient = 0;
 	p_Remainder.Clear( ); 
 	p_Quotient.Clear( );
 	unsigned i = p_Dividend.m_Size; 
@@ -817,6 +836,45 @@ void LargeInteger::Divide( const LargeInteger & p_Dividend, const LargeInteger &
 			}
 		}
 	}
+}
+
+void LargeInteger::Divide( LargeInteger & p_Divider, const unsigned short p_Divisor,
+	unsigned short & p_Remainder )
+{
+	// Make sure we don't divide by 0
+	if( p_Divisor == 0 )
+	{
+		return;
+	}
+
+	unsigned int i = p_Divider.m_Size;
+	p_Remainder = 0;
+
+	while( i-- != 0 )
+	{
+		unsigned long divided = ( unsigned long )( p_Remainder ) << 16 |
+			( unsigned long )( p_Divider.m_pComponents[ i ] );
+
+		p_Divider.m_pComponents[i] = divided / p_Divisor;
+		p_Remainder = divided % ( unsigned long )( p_Divisor );
+	}
+
+}
+
+unsigned short LargeInteger::Remainder( unsigned short p_Short ) const
+{
+	unsigned int i = m_Size;
+	unsigned short rem = 0;
+
+	while( i-- != 0 )
+	{
+		unsigned long divided = ( unsigned long )( rem ) << 16 |
+			( unsigned long )( m_pComponents[ i ] );
+
+		rem = divided % ( unsigned long )( p_Short );
+	}
+
+	return rem;
 }
 
 // Underflow and overflow functions that are called every time we reach any operator error.

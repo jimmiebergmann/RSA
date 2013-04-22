@@ -55,6 +55,7 @@ public:
 	void Copy( const LargeInteger & p_LargeInteger );
 	int Compare( const unsigned short p_Short ) const;
 	int Compare( const LargeInteger & p_LargeInteger ) const;
+	std::string GetString( const unsigned short p_Base ) const;
 
 	// Set functions
 	void SetComponent( const unsigned int p_Index, const unsigned short p_Value );
@@ -67,6 +68,7 @@ public:
 	unsigned short operator [ ] ( unsigned int p_Index ) const; // Same as GetComponent( ... )
 	operator bool( ) const;
 	bool operator ! ( ) const;
+	void operator = ( const unsigned short p_Short );
 	void operator = ( const LargeInteger & p_LargeInteger );
 	bool operator == ( const unsigned short p_Short ) const;
 	bool operator == ( const LargeInteger & p_LargeInteger ) const;
@@ -86,8 +88,10 @@ public:
 	LargeInteger & operator -= ( const LargeInteger & p_LargeInteger );
 
 	LargeInteger & operator *= ( const LargeInteger & p_LargeInteger );  // NOT WORKING
-	LargeInteger & operator /= ( const LargeInteger & p_LargeInteger );  // NOT WORKING
-	LargeInteger & operator %= ( const LargeInteger & p_LargeInteger );  // NOT WORKING
+	void operator /= ( const unsigned short & p_Short );
+	LargeInteger & operator /= ( const LargeInteger & p_LargeInteger );
+	unsigned short operator % ( const unsigned short p_Short );
+	LargeInteger & operator %= ( const LargeInteger & p_LargeInteger );
 
 
 	LargeInteger & operator <<= ( const unsigned int p_Bits );
@@ -102,6 +106,9 @@ private:
 	void Shift( unsigned int p_Bit );
 	void Divide( const LargeInteger & p_Dividend, const LargeInteger & p_Divisor,
 		LargeInteger & p_Quotient, LargeInteger & p_Remainder );
+	void Divide( LargeInteger & p_Divider, const unsigned short p_Divisor,
+		unsigned short & p_Remainder );
+	unsigned short Remainder( unsigned short p_Short ) const;
 	void Underflow( );
 	void Overflow( );
 
