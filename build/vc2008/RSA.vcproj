@@ -154,6 +154,14 @@
 			RelativePath="..\..\include\LargeInteger.hpp"
 			>
 		</File>
+		<File
+			RelativePath="..\..\source\RSA.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\include\RSA.hpp"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

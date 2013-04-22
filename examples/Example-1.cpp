@@ -23,7 +23,7 @@
 // 
 ///////////////////////////////////////////////////////////////////////////////////
 
-#include <LargeInteger.hpp>
+#include <RSA.hpp>
 #include <time.h>
 #include <iostream>
 
@@ -33,6 +33,9 @@ int main( )
 	// Let's seed the rand function by using the time.
 	// Might be useful later on.
 	srand( time( NULL ) );
+
+
+	RSA rsa;
 
 	//LargeInteger a( 2,	123, 42, 0  );
 	//LargeInteger b( 1,	2, 0, 0  );
@@ -46,7 +49,7 @@ int main( )
 	}
 */
 
-	unsigned int size = 1024 / 16;
+	/*unsigned int size = 1024 / 16;
 	LargeInteger a( size );
 
 	a.SetComponent( 0, 256 );
@@ -54,7 +57,7 @@ int main( )
 	{
 		a.SetComponent( i, 127 );
 	}
-	std::cout << a << std::endl;
+	std::cout << a << std::endl;*/
 
 	//a.Shift( 1 );
 	//std::cout << (a) << std::endl;
