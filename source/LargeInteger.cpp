@@ -634,7 +634,6 @@ LargeInteger & LargeInteger::operator <<= ( const unsigned int p_Bits )
 	for( unsigned int i = 0; ( i + startIndex ) < m_Size; i++ )
 	{
 		m_pComponents[ i + startIndex ] = (copy[ i ] << startRest) | overflow;
-
 		overflow = copy[ i ] >> ( 16 - startRest );
 	}
 
@@ -658,19 +657,24 @@ LargeInteger & LargeInteger::operator >>= ( const unsigned int p_Bits )
 	}
 
 	// Calculate the start of the bits
-	unsigned int startIndex = m_Size - 1 -
-		static_cast< unsigned int >( floor( (double)p_Bits / 16.0f ) );
+	int startIndex = static_cast< unsigned int >( floor( (double)p_Bits / 16.0f ) );
 	unsigned int startRest = p_Bits % 16;
 	unsigned int overflow = 0;
 
 	// Zero all the bits that are "new"
-	for( unsigned int i = 0; i < startIndex; i++ )
+	for( int i = m_Size - 1; i > m_Size - 1 - startIndex; i-- )
 	{
 		m_pComponents[ i ] = 0;
 	}
 
+	// Let's move the bits
+	for( int i = m_Size - 1; ( i - startIndex ) >= 0; i-- )
+	{
+		m_pComponents[ i - startIndex ] = (copy[ i ] >> startRest) | overflow;
+		overflow = copy[ i ] << ( 16 - startRest );
+	}
 
-	// delete the copy.
+	// delete the copy
 	delete [ ] copy;
 	return *this;
 }
