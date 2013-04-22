@@ -25,6 +25,7 @@
 
 #include "LargeInteger.hpp"
 #include <algorithm>
+#include <cmath>
 #include <stdlib.h>
 
 // Constructors / descructors
@@ -606,18 +607,71 @@ LargeInteger & LargeInteger::operator %= ( const LargeInteger & p_LargeInteger )
 
 LargeInteger & LargeInteger::operator <<= ( const unsigned int p_Bits )
 {
-
-	for( unsigned int i = 0; i < m_Size; i++ )
+	if( m_Size == 0 )
 	{
-
+		return *this;
 	}
 
+	// Create an array which is the copy of 
+	unsigned short * copy = new unsigned short[ m_Size ];
+	for( unsigned int i = 0; i < m_Size; i++ )
+	{
+		copy[ i ] = m_pComponents[ i ];
+	}
+
+	// Calculate the start of the bits
+	unsigned int startIndex = static_cast< unsigned int >( floor( (double)p_Bits / 16.0f ) );
+	unsigned int startRest = p_Bits % 16;
+	unsigned int overflow = 0;
+
+	// Zero all the bits that are "new"
+	for( unsigned int i = 0; i < startIndex; i++ )
+	{
+		m_pComponents[ i ] = 0;
+	}
+
+	// Let's move the bits
+	for( unsigned int i = 0; ( i + startIndex ) < m_Size; i++ )
+	{
+		m_pComponents[ i + startIndex ] = (copy[ i ] << startRest) | overflow;
+
+		overflow = copy[ i ] >> ( 16 - startRest );
+	}
+
+	// delete the copy.
+	delete [ ] copy;
 	return *this;
 }
 
 LargeInteger & LargeInteger::operator >>= ( const unsigned int p_Bits )
 {
+	if( m_Size == 0 )
+	{
+		return *this;
+	}
 
+	// Create an array which is the copy of 
+	unsigned short * copy = new unsigned short[ m_Size ];
+	for( unsigned int i = 0; i < m_Size; i++ )
+	{
+		copy[ i ] = m_pComponents[ i ];
+	}
+
+	// Calculate the start of the bits
+	unsigned int startIndex = m_Size - 1 -
+		static_cast< unsigned int >( floor( (double)p_Bits / 16.0f ) );
+	unsigned int startRest = p_Bits % 16;
+	unsigned int overflow = 0;
+
+	// Zero all the bits that are "new"
+	for( unsigned int i = 0; i < startIndex; i++ )
+	{
+		m_pComponents[ i ] = 0;
+	}
+
+
+	// delete the copy.
+	delete [ ] copy;
 	return *this;
 }
 
