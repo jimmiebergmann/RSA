@@ -45,14 +45,14 @@ class RSA
 public:
 
 	// Constructors
-	RSA( );
-	RSA( const LargeInteger & p_e, const LargeInteger & p_d, const LargeInteger & p_n );
-	RSA( const LargeInteger & p_e, const LargeInteger & p_d,
+	RSA( const unsigned int p_Size );
+	RSA( const unsigned int p_Size, const LargeInteger & p_e, const LargeInteger & p_d, const LargeInteger & p_n );
+	RSA( const unsigned int p_Size, const LargeInteger & p_e, const LargeInteger & p_d,
 		const LargeInteger & p_n, const LargeInteger & p_z );
-/*
+
 	// Initialization functions
 	bool RandomizeKeys( const unsigned int p_seed ); // Randomly generate the keys.
-	bool CalculateKeys( const unsigned int p_p, const unsigned int p_q ); // p_p and p_q must be 2 different primes.
+	/*bool CalculateKeys( const unsigned int p_p, const unsigned int p_q ); // p_p and p_q must be 2 different primes.
 	bool CalculatePublicKey( ); // Calculate the public key by using n and z which already should be set.
 	bool CalculatePrivateKey( ); // Calculate the private key by using e, n and z which already should be set.
 	bool CrackPrivateKey( ); // Requires e and n
@@ -85,6 +85,8 @@ private:
 	bool CalculateNZED( const unsigned int p_p, const unsigned int p_q ); // Combining the upper calculation functions.
 */
 	// Variable members.
+	bool m_Initialized;
+	unsigned int m_Size; // bit size (m_Size * 16) = number of bits.
 	LargeInteger m_e;	// Encryption key.
 	LargeInteger m_d; // Decryption key.
 	LargeInteger m_p; // Prime 1.

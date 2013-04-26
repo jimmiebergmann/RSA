@@ -25,111 +25,41 @@
 
 #include <RSA.hpp>
 #include <time.h>
+#include <cmath>
 #include <iostream>
 
 int main( )
 {
 
+	// Test the large integer Sqrt function
+
+	const unsigned int number = 1234567;
+	
+	LargeInteger a( 2, 0, 0 );
+	// Set the a's components
+	a.SetComponent( 0, number & 0xFFFF );
+	a.SetComponent( 1, (number & 0xFFFF0000) >> 16 );
+
+	//std::cout << a.Sqrt( );
+
+	std::cout << number	<< "   " << (unsigned int)(sqrt( (double)number ) ) << std::endl;
+	std::cout << a		<< "   " << a.Sqrt( ) << std::endl;
+
+
+/*
 	// Let's seed the rand function by using the time.
 	// Might be useful later on.
 	srand( time( NULL ) );
 
 
-	RSA rsa;
+	// Create a 16 bit RSA class
+	RSA rsa( 16 / 16 );
 
-	//LargeInteger a( 2,	123, 42, 0  );
-	//LargeInteger b( 1,	2, 0, 0  );
-	//LargeInteger largeInt_3( 2, 65535, 0 );
+	// Randomize keys
+	rsa.RandomizeKeys( 0 );
 
-/*
-	for( unsigned int i = 0; i < 64; i++ )
-	{
-		LargeInteger a( 4,	123, 65535, 4201 , 1024  );
-		std::cout << (a <<= i ) << std::endl;
-	}
-*/
+	*/
 
-	/*unsigned int size = 1024 / 16;
-	LargeInteger a( size );
-
-	a.SetComponent( 0, 256 );
-	for( unsigned int i = 1; i < size; i++ )
-	{
-		a.SetComponent( i, 127 );
-	}
-	std::cout << a << std::endl;*/
-
-	//a.Shift( 1 );
-	//std::cout << (a) << std::endl;
-	/*std::cout << (a <<= 32 ) << std::endl;
-	std::cout << (a >>= 48 ) << std::endl;
-	std::cout << (a <<= 20 ) << std::endl;
-*/
-
-
-	//LargeInteger a( 4,	123, 4200, 0, 0  );
-	//std::cout << (a) << std::endl;
-	//std::cout << (a <<= 46 ) << std::endl;
-
-	//std::cout << a << std::endl;
-	//std::cout << (a <<= 11 ) << std::endl;
-
-
-	//std::cout << (bool)(a != (unsigned short)65535) << std::endl;
-
-/*
-	std::cout << a << std::endl;
-	std::cout << b << std::endl;
-	std::cout << ( a - b ) << std::endl;
-	std::cout << ( a + b ) << std::endl;
-*/
-	//std::cout << a.Compare( b ) << std::endl;
-
-	/*std::cout << (bool)( b > a ) << std::endl;
-	std::cout << (bool)( b >= a ) << std::endl;
-
-	std::cout << (bool)( b < a ) << std::endl;
-	std::cout << (bool)( b <= a ) << std::endl;*/
-
-/*
-	std::cout << a << std::endl;
-	std::cout << b << std::endl;
-	std::cout << ( a - b ) << std::endl;
-*/
-/*
-	if( !a )
-	{
-		std::cout << "True!" << std::endl;
-	}*/
-
-
-	
-	/*std::cout << largeInt_1 << std::endl;
-	std::cout << largeInt_2 << std::endl;
-
-	largeInt_1 -= largeInt_1;//largeInt_1 + largeInt_2;
-
-	
-	std::cout << largeInt_1 << std::endl;*/
-	//std::cout << largeInt_3 << std::endl;
-
-	//std::cout << ( largeInt_1 == (unsigned short)65535 ) << std::endl;
-	//std::cout << ( largeInt_2 == (unsigned int)65535 + 65535 + 1 ) << std::endl;
- 
-
-
-/*
-	largeInt_1.PrintBinary( );
-	std::cout << std::endl;
-	largeInt_2.PrintBinary( );
-	std::cout << std::endl << std::endl;
-
-	//largeInt_1 -= largeInt_2;
-
-	largeInt_3.PrintBinary( );
-	std::cout << std::endl;
-
-*/
 	// Wait for any input in order to close the program.
 	std::cin.get( );
 	return 0;

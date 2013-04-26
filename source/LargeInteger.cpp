@@ -125,6 +125,9 @@ void LargeInteger::Clear( )
 
 void LargeInteger::Copy( const LargeInteger & p_LargeInteger )
 {
+	// SHOULDN'T WE ZERO SOME COMPONENTS
+
+
 	// Make sure we don't go out of bound by calculating the right size.
 	unsigned int componentsToCopy = ( m_Size >= p_LargeInteger.m_Size ) ? p_LargeInteger.m_Size : m_Size ;
 
@@ -214,6 +217,39 @@ int LargeInteger::Compare( const LargeInteger & p_LargeInteger ) const
 	return 0;
 }
 
+LargeInteger LargeInteger::Sqrt( )
+{
+	LargeInteger sqrt( m_Size );
+
+
+
+	return LargeInteger( sqrt );
+}
+
+// Set functions
+void LargeInteger::SetComponent( const unsigned int p_Index, const unsigned short p_Component )
+{
+	if( p_Index < m_Size )
+	{
+		m_pComponents[ p_Index ] = p_Component;
+	}
+}
+
+// Get functions
+unsigned short LargeInteger::GetComponent( const unsigned int p_Index ) const
+{
+	if( p_Index >= m_Size )
+	{
+		return 0;
+	}
+
+	return m_pComponents[ p_Index ];
+}
+
+unsigned int LargeInteger::GetSize( ) const
+{
+	return m_Size;
+}
 
 std::string LargeInteger::GetString( const unsigned short p_Base ) const
 {
@@ -243,31 +279,6 @@ std::string LargeInteger::GetString( const unsigned short p_Base ) const
 	// Reverse and return the buffer
 	std::reverse( Buffer.begin( ), Buffer.end( ) );
 	return Buffer;
-}
-
-// Set functions
-void LargeInteger::SetComponent( const unsigned int p_Index, const unsigned short p_Component )
-{
-	if( p_Index < m_Size )
-	{
-		m_pComponents[ p_Index ] = p_Component;
-	}
-}
-
-// Get functions
-unsigned short LargeInteger::GetComponent( const unsigned int p_Index ) const
-{
-	if( p_Index >= m_Size )
-	{
-		return 0;
-	}
-
-	return m_pComponents[ p_Index ];
-}
-
-unsigned int LargeInteger::GetSize( ) const
-{
-	return m_Size;
 }
 
 // Operators
@@ -327,6 +338,12 @@ void LargeInteger::operator = ( const unsigned short p_Short )
 
 void LargeInteger::operator = ( const LargeInteger & p_LargeInteger )
 {
+	// Allocate the large interger if we have to.
+	if( m_Size == 0 )
+	{
+		Allocate( p_LargeInteger.m_Size );
+	}
+
 	Copy( p_LargeInteger );
 }
 
@@ -387,6 +404,11 @@ bool LargeInteger::operator <= ( const unsigned short p_Short ) const
 bool LargeInteger::operator <= ( const LargeInteger & p_LargeInteger ) const
 {
 	return Compare( p_LargeInteger ) <= 0;
+}
+
+LargeInteger & LargeInteger::operator ++ ( )
+{
+	return *this += (unsigned short)( 1 );
 }
 
 LargeInteger & LargeInteger::operator += ( const unsigned short p_Short )

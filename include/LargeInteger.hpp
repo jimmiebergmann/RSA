@@ -55,7 +55,7 @@ public:
 	void Copy( const LargeInteger & p_LargeInteger );
 	int Compare( const unsigned short p_Short ) const;
 	int Compare( const LargeInteger & p_LargeInteger ) const;
-	std::string GetString( const unsigned short p_Base ) const;
+	LargeInteger Sqrt( );
 
 	// Set functions
 	void SetComponent( const unsigned int p_Index, const unsigned short p_Value );
@@ -63,6 +63,7 @@ public:
 	// Get functions
 	unsigned short GetComponent( const unsigned int p_Index ) const;
 	unsigned int GetSize( ) const;
+	std::string GetString( const unsigned short p_Base ) const;
 
 	// Operators
 	unsigned short operator [ ] ( unsigned int p_Index ) const; // Same as GetComponent( ... )
@@ -82,6 +83,7 @@ public:
 	bool operator < ( const LargeInteger & p_LargeInteger ) const;
 	bool operator <= ( const unsigned short p_Short ) const;
 	bool operator <= ( const LargeInteger & p_LargeInteger ) const;
+	LargeInteger & operator ++ ( );
 	LargeInteger & operator += ( const unsigned short p_Short );
 	LargeInteger & operator += ( const LargeInteger & p_LargeInteger );
 	LargeInteger & operator -= ( const unsigned short p_Short );
